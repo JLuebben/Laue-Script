@@ -1,0 +1,11 @@
+
+if __name__ == '__main__':
+    import numpy
+    import scipy
+    import sklearn
+    try:
+        from lsinvcif.LSInvCif_main import main
+    except ImportError:
+        print 'ImportError: Main module not found. Please check if PYTHONPATH ist set up correctly.'
+        exit(1)
+    main()
