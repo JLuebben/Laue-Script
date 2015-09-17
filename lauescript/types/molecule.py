@@ -343,17 +343,22 @@ class MOLECULE(MoleculeInterface):
         blacklist = []
         for atom1 in self.iter_atoms(sort=sort):
             # for atom2 in self.iter_atoms(sort=sort):
-            for atom2 in atom1.partner:
-                # if not atom1 == atom2:
-                    if not bound or is_bound(atom1.cart, atom1.element, atom2.cart, atom2.element):
-                        blackstring = '{}{}'.format(*sorted([atom1.name, atom2.name]))
-                        if unique and not blackstring in blacklist:
-                            yield atom1, atom2
-                            blacklist.append(blackstring)
-                        elif not unique:
-                            yield atom1, atom2
-                    else:
-                        break
+            if bound:
+                for atom2 in atom1.partner:
+                    # if not atom1 == atom2:
+                        if not bound or is_bound(atom1.cart, atom1.element, atom2.cart, atom2.element):
+                            blackstring = '{}{}'.format(*sorted([atom1.name, atom2.name]))
+                            if unique and not blackstring in blacklist:
+                                yield atom1, atom2
+                                blacklist.append(blackstring)
+                            elif not unique:
+                                yield atom1, atom2
+                        else:
+                            break
+            else:
+                for atom2 in self.iter_atoms(sort=sort):
+                    if not atom1 == atom2:
+                        yield atom1, atom2
 
 
 class DABA_MOLECULE(MOLECULE):
