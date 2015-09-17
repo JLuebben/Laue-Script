@@ -22,7 +22,7 @@ averaged.
 '''
 
 
-from apd.lib.crystgeom2.iterators import database, atoms_of_element
+from lauescript.cryst.iterators import database, atoms_of_element
 from numpy import mean
 
 KEY = 'gethdist'  # Edit this to control which cmd line keyword starts the plugin.

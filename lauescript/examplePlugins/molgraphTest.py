@@ -4,7 +4,7 @@ KEY = 'molgraph'  # Edit this to control which cmd line keyword starts the plugi
 OPTION_ARGUMENTS = {'load': 'myFile.txt'}  # Edit this to define cmd line options for
 # the plugin and their default values.
 
-import apd.lib.crystgeom2.molgraph as mg
+import lauescript.cryst.molgraph as mg
 
 
 def run(pluginManager):

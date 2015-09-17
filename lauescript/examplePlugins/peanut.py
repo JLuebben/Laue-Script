@@ -1,8 +1,8 @@
 __author__ = 'jens'
 
-from apd.lib.crystgeom import Uiso
-from apd.lib.crystgeom2.transformations import cart2frac_ADP
-from apd.lib.apdio.loader import Loader
+from lauescript.cryst.crystgeom import Uiso
+from lauescript.cryst.transformations import cart2frac_ADP
+from lauescript.laueio.loader import Loader
 
 KEY = 'peanut'  # Edit this to control which cmd line keyword starts the plugin.
 OPTION_ARGUMENTS = {'load': 'myFile.txt',

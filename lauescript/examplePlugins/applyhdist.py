@@ -17,8 +17,8 @@ original bond direction.
 
 '''
 
-from apd.lib.apdio.xd_iop import XDIOP
-from apd.lib.crystgeom2.transformations import cart2frac
+from lauescript.laueio.xd_iop import XDIOP
+from lauescript.cryst.transformations import cart2frac
 
 KEY = 'applyhdist'
 OPTION_ARGUMENTS = ['write']

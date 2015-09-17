@@ -187,7 +187,10 @@ class ATOM(AtomInterface):
 
     def __sub__(self, atom):
         x, y, z = self.frac
-        xx, yy, zz = atom.get_frac() + 99.5
+        try:
+            xx, yy, zz = atom.get_frac() + 99.5
+        except TypeError:
+            xx, yy, zz = array(atom.get_frac()) + 99.5
         dx = (xx - x) % 1 - 0.5
         dy = (yy - y) % 1 - 0.5
         dz = (zz - z) % 1 - 0.5

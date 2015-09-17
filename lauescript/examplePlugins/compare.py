@@ -2,7 +2,7 @@ __author__ = 'jens'
 
 import numpy as np
 from numpy.linalg import LinAlgError
-from apd.lib.apdio.loader import Loader
+from lauescript.laueio.loader import Loader
 
 KEY = 'compare'  # Edit this to control which cmd line keyword starts the plugin.
 OPTION_ARGUMENTS = {'load': 'apd.res',

@@ -20,6 +20,6 @@ def iter_atoms(molecule, sort=False):
     return molecule.iter_atoms(sort)
 
 
-def iter_atom_pairs(molecule, bound=True, unique=True):
-    return molecule.iter_atom_pairs(bound, unique)
+def iter_atom_pairs(molecule, bound=True, unique=True, sort=True):
+    return molecule.iter_atom_pairs(bound, unique, sort=sort)
 
