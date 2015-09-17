@@ -1,9 +1,0 @@
-('/home/jens/Laue-Script/projects/LSInvCif/dist/LSInvCif',
- True,
- False,
- None,
- None,
- [],
- None,
- False,
- 1429787957)
