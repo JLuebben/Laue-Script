@@ -4,9 +4,7 @@ Created on Jun 19, 2014
 @author: jens
 """
 from copy import deepcopy, copy
-
 from numpy import array, matrix, dot
-
 from lauescript.cryst.transformations import ADP_to_matrix, ADP_to_XD_list, frac2cart, frac2cart_ADP
 from lauescript.types.adp import ADPDataError
 
@@ -55,15 +53,12 @@ class SymmetryElement(object):
         return string
 
     def _parse_line(self, symm):
-        # print
-        # print symm
         symm = symm.lower().replace(' ', '')
         chars = ['x', 'y', 'z']
         line = []
         for char in chars:
             element, symm = self._partition(symm, char)
             line.append(element)
-            # print '{}: {}'.format(char, element)
         if symm:
             trans = self._float(symm)
         else:
@@ -94,12 +89,7 @@ class SymmetryElement(object):
 
     def __add__(self, atom):
         new_atom = copy(atom)
-        # new_atom = deepcopy(atom)
         oldfrac = new_atom.get_frac()
-        # print
-        # print atom.name,oldfrac
-        # print self.matrix
-        # print dot(oldfrac, self.matrix), dot(oldfrac, self.matrix)+self.trans
         newfrac = dot(oldfrac, self.matrix) + self.trans
         newfrac = array(*newfrac[0,].tolist())
         new_atom.set_frac(newfrac.flatten().tolist())

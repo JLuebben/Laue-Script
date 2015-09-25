@@ -43,6 +43,7 @@ class AtomInterface(object):
         self.residue = residue
         self.custom_attributes = {}
         self.adp_updated = False
+        self.special_position = False
 
     def set_custom_attribute(self, name, value):
         self.custom_attributes[name] = value
@@ -129,6 +130,9 @@ class AtomInterface(object):
             return self.adp
         else:
             raise NoADPError
+
+    def set_special(self, value):
+        self. special_position = value
 
     def __sub__(self, other):
         pass
@@ -244,27 +248,13 @@ class ATOM(AtomInterface):
                  type(self.__class__)]
 
         for attr in dir(self):
-            # ===================================================================
-            # print attr,type(getattr(self,attr))
-            #===================================================================
-
             if not type(getattr(self, attr)) in types:
                 if any(i in attr for i in self.keep) \
                         or any(i in attr for i in keep) \
                         or attr[0:2] == '__':
-                    #===========================================================
-                    # print attr,type(getattr(self,attr))
-                    #===========================================================
                     continue
                 else:
                     pass
-                    #===========================================================
-                    # print attr,type(getattr(self,attr))
-                    #===========================================================
-                    #===========================================================
-                    # x=getattr(self,attr)
-                    # del x
-                    #===========================================================
 
     def __str__(self):
         return self.name
@@ -353,15 +343,6 @@ class ATOM(AtomInterface):
 
         If the atom is prochiral, the side (re/si) is determined.
         """
-
-        # =======================================================================
-        # if len(cg.get_framework_neighbours(self, useH=True))>1:
-        #     #===================================================================
-        #     # print 'No prochirality checked for:',self.name
-        #     #===================================================================
-        #     self.prochiral=False
-        #     return
-        #=======================================================================
         if self.element in halogens:
             self.prochiral = False
             return
@@ -460,22 +441,6 @@ class ATOM(AtomInterface):
             self.disps[str(freq)] = disps
         except:
             self.disps = {str(freq): disps}
-
-    #===========================================================================
-    # def write_daba(self,filepointer):
-    #     """
-    #     Writes the atoms orientation and its ADP representation into a
-    #     database file.
-    #     """
-    #     filepointer.write('\nName: '+self.invariom_name+' '+self.name)
-    #     filepointer.write('\nPosition: {:5f} {:5f} {:5f}'\
-    #                     .format(self.cart[0],self.cart[1],self.cart[2]))
-    #     filepointer.write('\nADP: {:+5f} {:+5f} {:+5f} {:+5f} {:+5f} {:+5f}'\
-    #                      .format(self.adp['cart_int'][0],self.adp['cart_int'][1],\
-    #                       self.adp['cart_int'][2],self.adp['cart_int'][3],\
-    #                       self.adp['cart_int'][4],self.adp['cart_int'][5]))
-    #     #return(self.invname)
-    #===========================================================================
 
     def turn(self):
         return

@@ -60,6 +60,7 @@ def run(outputName=None, data_path=None, plugin_path=None):
     conf.set('Errors', 'Port', 7235)
     conf.set('Database', 'Frequency_cutoff', 200)
     conf.set('Database', 'ModelcompountRootdirectory', 'Not used')
+    conf.set('Database', 'frequency_scale', '1')
     with open(expanduser(outputName), 'w') as fp:
         conf.write(fp)
 

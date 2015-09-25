@@ -7,9 +7,10 @@ Module containing definitions for datatypes representing molecules.
 """
 from numpy import array, pi, matrix, sqrt, sin, cos, zeros, tanh
 from sklearn.neighbors import NearestNeighbors
-
+from lauescript.cryst.iterators import iter_atoms, iter_atom_pairs
 from lauescript.types.atom import ATOM
-from lauescript.invstring2 import get_invariom_names
+# from lauescript.invstring2 import get_invariom_names
+from lauescript.cryst.symmetry import SymmetryElement
 from lauescript.cryst.crystgeom import proton_number
 from lauescript.cryst.geom import is_bound, framework_crawler, get_framework_neighbors
 from lauescript.cryst.sort import SortAtom
@@ -301,7 +302,7 @@ class MOLECULE(MoleculeInterface):
         for atom in self.atoms:
             if atom.molecule_id == None:
                 atom.set_molecule_id(self.ID)
-                self.ID +=1
+                self.ID += 1
         return self.ID
 
     def get_distances(self, force_update=False):
@@ -359,6 +360,48 @@ class MOLECULE(MoleculeInterface):
                 for atom2 in self.iter_atoms(sort=sort):
                     if not atom1 == atom2:
                         yield atom1, atom2
+
+    def expand(self, pluginManager):
+        printer = pluginManager.get_active_printer()
+        loader = pluginManager.get_variable('loader')
+        active_id = loader.get_active_id()
+        if not active_id.startswith('shelx'):
+            printer.highlight('Error: Wrong input file ID: {}.'.format(active_id))
+            printer('Molecule expansion currently only works with \'Shelxl\' type files.')
+            printer('Note: CIFs written by \'Shelxl\' will be supported soon.')
+            return
+        symmetry_elements = loader.get_symmetry()
+        lattice = float(loader.get_lattice())
+        if lattice > 0:
+            centric = True
+        else:
+            centric = False
+        symms = []
+        for symm in symmetry_elements:
+            symm = SymmetryElement(symm, centric=False)
+            symms.append(symm)
+        if centric:
+            symms.append(SymmetryElement(['-X', '-Y', '-Z']))
+            for symm in symmetry_elements:
+                symm = SymmetryElement(symm, centric=True)
+                symms.append(symm)
+        newatoms = []
+        asymunits = {str(symm): [] for symm in symms}
+        for atom in iter_atoms(self):
+            atom.normalize()
+            for symm in symms:
+                newatom = symm + atom
+                newatom.normalize()
+                if not atom - newatom < 0.1:
+                    newatoms.append(newatom)
+                else:
+                    atom.set_special(True)
+                asymunits[str(symm)].append(newatom)
+        for atom in newatoms:
+            self += atom
+
+    def smartExpand(self):
+        pass
 
 
 class DABA_MOLECULE(MOLECULE):
@@ -502,7 +545,7 @@ class DABA_MOLECULE(MOLECULE):
 
     def get_criterion(self):
         """
-        Determines the sorting criterion representing the molecules 'size'.
+        Determines the sorting criterion representing the molecule's 'size'.
         """
         penalty = 0
         for atom in self.atoms:

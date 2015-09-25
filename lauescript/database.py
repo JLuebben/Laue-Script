@@ -7,6 +7,7 @@ Module containing functionality related to the creation of
 APD-database files.
 """
 from os import walk, listdir
+import os
 
 import numpy as np
 
@@ -464,7 +465,8 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
             printer.noreturn('  ' + progress[progress_counter % len(progress)])
             progress_counter += 1
 
-        if path.endswith(log_mask):
+        # if path.endswith(log_mask):
+        if os.path.split(path)[1] == log_mask:
             #===================================================================
             # If the log flag is still True, there was a parsing problem and the other
             # flags need to be reset.
