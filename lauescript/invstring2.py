@@ -487,6 +487,7 @@ class InvariomGenerator(object):
         self.names = names
         if system == 'frac' and not cell:
             print 'invsting2.py: Error. Cell missing.'
+            exit()
 
         samples = coordinates
 

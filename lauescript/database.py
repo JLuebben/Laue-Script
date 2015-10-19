@@ -353,6 +353,7 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     #===========================================================================
     log_mask = 'D95++3df3pd'
     log_mask = 'TZVP'
+    # log_mask = 'def2TZVP'
     xd_mask = 'xd_k'
     xd_mask2 = 'tonto2'
     log = None
@@ -466,6 +467,8 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
             progress_counter += 1
 
         # if path.endswith(log_mask):
+        if os.path.split(path)[0].endswith('Modellverbindungen'):
+            res, mas, log, fchk = None, None, None, None
         if os.path.split(path)[1] == log_mask:
             #===================================================================
             # If the log flag is still True, there was a parsing problem and the other
@@ -509,6 +512,7 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                 if 'xd.mas' == filename:
                     compound_name, cell = cg.read_xd_master_file(path + '/' + filename, dabaerror_log)
                     mas = True
+
 
         if res and mas and log and fchk:
             try:
