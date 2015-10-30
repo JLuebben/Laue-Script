@@ -1,0 +1,26 @@
+Laue-Script Installation Guide
+
+Windows
+
+Step 1: Install GitShell
+
+Step 2: Start GitShell and download the Laue-Script files with 
+	git clone https://github.com/JLuebben/Laue-Script /some/local/path/
+
+Step 3: Navigate to /some/local/path/lauescript/data and unpack the file database.zip so that the
+compressed file is located in /some/local/path/lauescript/data/
+
+Step 4: Setup enviroment variables. To make sure Python knows where the Laue-Script files are located /some/local/path/ must be added to your operating system's enviroment variables.
+
+Step 5: Test if everything works by opening a Python console and type 'import lauescript'.
+
+Step 6: You might miss some dependencies. Make sure that the folowing packages are installed:
+	numpy
+	scipy
+	sk-learn
+	networkX
+
+
+Linux
+
+Do the same steps as in the Windows description except installing GitShell. Any shell will do the trick.
