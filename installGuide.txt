@@ -10,7 +10,7 @@ Step 2: Start GitShell and download the Laue-Script files with
 Step 3: Navigate to /some/local/path/lauescript/data and unpack the file database.zip so that the
 compressed file is located in /some/local/path/lauescript/data/
 
-Step 4: Setup enviroment variables. To make sure Python knows where the Laue-Script files are located /some/local/path/ must be added to your operating system's enviroment variables.
+Step 4: Setup enviroment variables. To make sure Python knows where the Laue-Script files are located /some/local/path/ must be added to your operating system's PYTHONPATH enviroment variables.
 
 Step 5: Test if everything works by opening a Python console and type 'import lauescript'.
 
