@@ -7,6 +7,7 @@ Plugin implementing the Hirshfeld test testing the
 rigidity of a structure model.
 """
 KEY = 'H'
+OPTION_ARGUMENTS = {'compound': 'exp'}
 
 import numpy as np
 
@@ -172,9 +173,9 @@ def run(configurator, **kwargs):
     """
     global indent, printer
     printer = configurator.setup()
-    global data
+    global data, compoundKey
     data = configurator.get_variable()
-
+    compoundKey = configurator.arg('compound')
     usearg = configurator.arg('use')
     if not usearg:
         use = 'cart_meas'

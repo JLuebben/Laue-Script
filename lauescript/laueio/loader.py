@@ -93,10 +93,9 @@ class Loader(object):
         Loader.read_files.append(self.IOP.filename)
         try:
             self.IOP.read()
-        except IOError:
+        except IOError as a:
             # self.printer('Error: No valid file named {} found'.format(self.IOP.filename))
-            apd_exit(1, '\nError: No valid file named {} found.\nTerminating APD-Toolkit.'.format(self.IOP.filename),
-                     report=False)
+            apd_exit(1, '\nError: No valid file named {} found.\nTerminating APD-Toolkit.'.format(self.IOP.filename))
         molecule = MOLECULE(name, cell=self.IOP.get_cell())
         for atom in self.IOP.provide(['cart', 'frac', 'adp_cart', 'element']):
             if not atom[4].startswith('W'):

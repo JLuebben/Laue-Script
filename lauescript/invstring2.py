@@ -224,7 +224,8 @@ def get_invariom_names_simple(names,
                               verbose=True,
                               output=None,
                               dynamic=False,
-                              classic=False):
+                              classic=False,
+                              newH=True):
     """
     Generator that returns the desired output once for every set
     of threshold values.

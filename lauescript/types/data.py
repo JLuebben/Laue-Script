@@ -244,16 +244,16 @@ class DATA(dict):
         self.atoms = atoms
         self.invarioms = invarioms
 
-    def iter_atoms(self, sort=False):
+    def iter_atoms(self, sort=False, key='exp'):
         """
         Iterator iterating over all atoms of the molecule with the
         name 'exp'.
         """
         if not sort:
-            for atom in self['exp'].atoms:
+            for atom in self[key].atoms:
                 yield atom
         else:
-            for atom in SortAtom.sort(self):
+            for atom in SortAtom.sort(self, molecule=self[key]):
                 yield atom
 
 

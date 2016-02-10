@@ -213,6 +213,9 @@ class ATOM(AtomInterface):
         dd = a**2*dx**2 + b**2*dy**2 + c**2*dz**2 + 2*b*c*cos(alpha)*dy*dz + 2*a*c*cos(beta)*dx*dz + 2*a*b*cos(gamma)*dx*dy
         return dd**.5
 
+    def cartDistance(self, other):
+        return norm(self.cart - other.cart)
+
     def set_active_invariom(self, name):
         self.invariom_name = name
         self.orientation = self.invarioms[name]
@@ -394,7 +397,10 @@ class ATOM(AtomInterface):
         neighbors = []
         for atom2 in self.molecule.atoms:
             if not self == atom2:
-                neighbors.append((atom2, norm(self.cart - atom2.cart)))
+                try:
+                    neighbors.append((atom2, self-atom2))
+                except KeyError:
+                    neighbors.append((atom2, norm(self.cart - atom2.cart)))
         neighbors = sorted(neighbors, key=lambda value: value[1])
         self.partner = [neighbor[0] for neighbor in neighbors]
 
@@ -413,7 +419,7 @@ class ATOM(AtomInterface):
                     self.orientation[0] *= -1
                     self.orientation[1] *= -1
             cg.rotate_3D(self, self.invariom)
-            self.turn()
+            # self.turn()
         else:
             print('Warning: Using U_eq for {}'.format(self.name))
             Uiso = cg.Uiso(self.invariom.adp['cart_int'])

@@ -351,6 +351,8 @@ class PathGenerator(HarmonyGenerator):
                 newValues[i] = freeList.pop()
         return Harmony(newValues)
 
+def dummy(i):
+    pass
 
 def harmonize(bounds,
               costFunction,
@@ -363,7 +365,8 @@ def harmonize(bounds,
               convergenceRate=0,
               dynamicPitch=0,
               verbose=False,
-              generator=HarmonyGenerator):
+              generator=HarmonyGenerator,
+              callBack=dummy):
     """
     Interface function for the Harmony Search global
     optimization algorithm.
@@ -429,6 +432,7 @@ def harmonize(bounds,
         except ConvergenceReached:
             converged = True
             break
+        callBack(_)
     if verbose:
         print 'Final Memory:'
         print memory

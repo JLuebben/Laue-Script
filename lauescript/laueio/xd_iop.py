@@ -290,6 +290,49 @@ class XDIOP(IOP):
         for line in self.master_body:
             filepointer.write(str(line))
 
+    def export_shelxl(self, temp = 100, waveLength=0.71073, title='XDImport',
+                      disps=True, fixXYZ=False, globalU=False, scale = 1.0,
+                      hklf=4):
+        from lauescript.cryst.tables import atomtable
+        if fixXYZ:
+            fixXYZ = 10
+        else:
+            fixXYZ = 0
+        sfacs = set([atom.get_element() for atom in self.atoms.values()])
+        try:
+            sfacs.remove('H')
+        except KeyError:
+            pass
+        sfacList = sorted(list(sfacs), key=lambda sfac: atomtable[sfac]) + ['H']
+        sfacs = {x: i+1 for i, x in enumerate(sfacList)}
+        content = 'TITL {}\nCELL {} {}\nZERR 1 {}'.format(title, waveLength, ' '.join(['{:7.4f}'.format(x) for x in self.cell]), ' '.join(['{:7.4f}'.format(d/100.) for d in self.cell]))
+        content += '\nLATT 1'
+        content += '\nSFAC {}'.format(' '.join(sfacList))
+        if not disps:
+            for sfa in sfacList:
+                content += '\nDISP ${} 0.000 0.000'.format(sfa)
+        content += '\nUNIT {}'.format(' '.join([str(sfacs[x]) for x in sfacList]))
+        content += '\nL.S. 10'
+        content += '\nLIST 6'
+        content += '\nTEMP {}'.format(temp-273)
+        content += '\nPLAN 20'
+        content += '\nWGHT 0.0'
+        content += '\nFVAR {:.2f}'.format(scale)
+        if globalU:
+            content += ' {}'.format(globalU)
+        atomList = sorted(self.atoms.values(), reverse=True, key= lambda atom: atom.get_name())
+        for atom in atomList:
+            content += '\n{:<5} {} {} 11.0'.format(atom.get_name().replace('(', '').replace(')', ''),
+                                                             sfacs[atom.get_element()],
+                                                             ' '.join(['{:9.5f}'.format(x+fixXYZ) for x in atom.get_frac()]))
+            if not globalU:
+                content += ' {}\n {}'.format(' '.join(['{:9.5f}'.format(x) for x in atom.get_adp_frac()[:2]]),
+                                             ' '.join(['{:9.5f}'.format(x) for x in atom.get_adp_frac()[2:]]))
+            else:
+                content += ' 21.0'
+        content += '\nHKLF {}\nEND'.format(hklf)
+        return content
+
 
 if __name__ == '__main__':
     test = XDIOP('xd.res')

@@ -15,6 +15,7 @@ from random import randint
 
 import numpy as np
 
+bestFit = None
 
 def match_point_clouds(cloud1, cloud2, threshold=1, maxiter=None):
     """
@@ -141,6 +142,9 @@ def get_transformation(cloud1, cloud2, matchlist):
                     [v1[2], v2[2], v3[2]]])
     return np.dot(m1.T, m2)
 
+def get_best_fit():
+    return bestFit
+
 
 def accept(cloud1, cloud2, matchlist, threshold):
     """
@@ -161,7 +165,10 @@ def accept(cloud1, cloud2, matchlist, threshold):
         coord2 = cloud2[matchlist[i]]
         dist_list.append(abs(np.linalg.norm(coord1 - coord2)))
     # print np.mean(dist_list)
-    if np.mean(dist_list) < threshold:
+    m = np.mean(dist_list)
+    if m < threshold:
+        global bestFit
+        bestFit = m
         return True
     else:
         # =======================================================================

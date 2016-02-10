@@ -158,7 +158,7 @@ class IOP(object):
         if new:
             self._rebuild_file()
 
-    def export(self, exportformat):
+    def export(self, exportformat, **kwargs):
         """
         Interface method for exporting to different file formats.
         The implementing IOP must implement a method with the name
@@ -167,7 +167,7 @@ class IOP(object):
         :return: None
         """
         attr = getattr(self, 'export_' + exportformat)
-        return attr()
+        return attr(**kwargs)
 
     def __str__(self):
         return 'To make use of the \'write\' method please override ' \

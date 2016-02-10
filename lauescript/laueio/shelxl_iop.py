@@ -142,6 +142,7 @@ class ShelxlAtom(object):
 
 class ShelxlIOP(IOP):
     cmds = ['REM',
+            'BEDE',
             'MOLE',
             'TITL',
             'CELL',
