@@ -144,7 +144,7 @@ def run(pluginManager):
     to the function.
     Use the APD_Printer instance returned by
     pluginManager.setup() instead of the 'print'
-    statement to generate autoformated cmd line output.
+    statement to generate auto-formatted cmd line output.
     :param pluginManager: Reference to the plugin manager
     instance.
     """

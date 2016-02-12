@@ -225,14 +225,14 @@ def FlexLoad(data, loader, dabapath, config, filename='./'):
     loader.auto_setup(filename)
     data.register_molecule(loader.load('exp'), 'exp')
 
-
     data['exp'].give_cell(loader.get_cell())
-    T = int(config.arg('temp'))
+    T = config.arg('temp')
     if not T:
         T = loader.get_temperature()
     if not T:
         printer.highlight('Warning: No temperature specified. Falling back to default.')
         T = 100
+    T = int(T)
     data.give_temperature(T)
 
     dabapa = dabapath + '/APD_DABA_{:.1f}_.txt'.format(data.temperature)
