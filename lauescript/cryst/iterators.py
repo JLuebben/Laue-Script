@@ -2,6 +2,7 @@ __author__ = 'jens'
 
 import cPickle
 from os.path import join
+from geom import get_framework_neighbors
 
 
 def database(pluginManager):
@@ -16,7 +17,10 @@ def atoms_of_element(molecule, element='H'):
     """
     Returns a list of all atoms of a given element.
     """
-    return [atom for atom in molecule.atoms if atom.element == element]
+    try:
+        return [atom for atom in molecule.atoms if atom.element == element]
+    except AttributeError:
+        return [atom for atom in molecule if atom.element == element]
 
 def atoms_with_attribute(molecule, attribute, value=None):
     """
@@ -44,4 +48,8 @@ def iter_atoms(molecule, sort=False):
 
 def iter_atom_pairs(molecule, bound=True, unique=True, sort=True):
     return molecule.iter_atom_pairs(bound, unique, sort=sort)
+
+
+def iter_riding_hydrogen_atoms(atom):
+    return atoms_of_element(get_framework_neighbors(atom=atom, useH=True))
 

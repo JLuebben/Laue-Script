@@ -191,8 +191,13 @@ class DATA(dict):
         """
         Transfers the ADP from the modelcompounds to the 'exp' molecule.
         """
+        toleratedAtoms = []
         for atom in self['exp'].atoms:
-            atom.transfer_adp()
+            tolerated = atom.transfer_adp()
+            if tolerated:
+                toleratedAtoms.append(tolerated)
+        for atom in toleratedAtoms:
+            atom.averageADP()
 
     def _get_orientations(self):
         """
@@ -206,6 +211,8 @@ class DATA(dict):
         Links all atoms in 'exp' to their invarioms.
         """
         for exp_atom in self['exp'].atoms:
+            if exp_atom.isTolerated():
+                continue
             for model_atom in self[exp_atom.model_compound.name].atoms:
                 inv = exp_atom.get_active_invariom()
                 if inv in model_atom.invarioms.keys():

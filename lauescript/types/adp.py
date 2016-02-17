@@ -15,3 +15,7 @@ class ADP(dict):
             return super(ADP, self).__getitem__(item)
         except KeyError:
             raise ADPDataError
+        
+    def __setitem__(self, key, value):
+        # print key, value
+        super(ADP, self).__setitem__(key, value)

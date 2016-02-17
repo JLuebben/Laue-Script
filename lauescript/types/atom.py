@@ -159,6 +159,7 @@ class ATOM(AtomInterface):
         be specified on initilization. Otherwise the attributes
         can be set later by calling the corresponding methods.
         """
+        self.tolerated = False
         self.molecule_id = None
         self.invariom_code = None
         self.invariom_code = None
@@ -354,15 +355,15 @@ class ATOM(AtomInterface):
             if self.invariom_name[2] is '3':
                 print 'Warning! Approximating ADP in 3 membered ring for atom {}.'.format(self.name)
             return
-        if not cg.get_framework_neighbours(atom=self, useH=True):
+        if not get_framework_neighbors(atom=self, useH=True):
             self.prochiral = False
             return
-        neighbor0 = cg.get_framework_neighbours(self, useH=True)
+        neighbor0 = get_framework_neighbors(self, useH=True)
         if len(neighbor0) > 1:
             self.prochiral = False
             return
         neighbor0 = neighbor0[0]
-        neighbors = [atom.element for atom in cg.get_framework_neighbours(neighbor0,
+        neighbors = [atom.element for atom in get_framework_neighbors(neighbor0,
                                                                           useH=True) if not atom == self]
         if any(self.element == i for i in neighbors):
             neighbors.remove(self.element)
@@ -404,11 +405,23 @@ class ATOM(AtomInterface):
         neighbors = sorted(neighbors, key=lambda value: value[1])
         self.partner = [neighbor[0] for neighbor in neighbors]
 
+    def averageADP(self):
+        cartAdp = array([0]*6)
+        for atom in get_framework_neighbors(self):
+            cartAdp += atom.adp['cart_int']
+        self.adp['cart_int'] = cartAdp
+
     def transfer_adp(self):
         """
         Transfers the ADP of the invarioms to the atoms of interest by
         rotating the invraiom's ADP as defined by the orientation vectors.
         """
+        if self.tolerated:
+            return self
+            # adp = array([0]*6)
+            # for atom in get_framework_neighbors(self):
+            #     adp +=
+
         if not self.invariom:
             print self.invariom, self, 'Error in atom.transfer_adp()'
             exit()
@@ -493,10 +506,15 @@ class ATOM(AtomInterface):
         """
         self.set_frac([frac % 1 if frac > 0 else (1 + frac)%1 for frac in self.frac])
 
-
     def set_frac(self, frac):
         self.frac = frac
         self.cart = frac2cart(frac, self.molecule.get_cell())
+
+    def tolerate(self):
+        self.tolerated = True
+
+    def isTolerated(self):
+        return self.tolerated
 
 
 

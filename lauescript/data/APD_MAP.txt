@@ -675,7 +675,6 @@ S1c[1h1h1h]1c[1h1h1h]:dimethylsulfide
 6-O#6c[2o#6c]#6c[#6c1h]:pyran-2-one
 C1c1c1c1c:isopentane
 65-C#65c[#6n#5o]#6c[#6c@6c]#5c[#5c1h]:6-chloro-5-methyl-4-phenylfuro[2.3-b]pyridine
-6-C#6c[#6c1f]#6c[#6c1h]1cl:1.3-dichloro-2-fluorobenzene
 5-C#5n[#65c1h]#5c[~c#65c]1h:indol-3-carbaldehyde
 5-O#5c[~o#5c]#5c[#5c1h]:3-chlorofuran-2.4-diol
 5-C#5c[#5o1c]#5c[#5n1o]1c:4.5-dimethylisoxazol-3-ol
@@ -3747,7 +3746,6 @@ C1s[~o~o1c]1h1h1h:dimethylsulfone
 C2o~n[1h1h]@5c:furan-3-carboxamide
 6-C#6c[#6c1cl]#6c[#6c1cl]1c:1.3-dichloro-2-methylbenzene
 Si@6c1o1c1c:2-silapropan-2-ol
-6-C#6c[#6c1cl]#6c[#6c1cl]1f:1.3-dichloro-2-fluorobenzene
 6612-C#6612c#612c#6c[#6c1h]:perylene
 5-C~n[1h1h]#5n[#5c@6c]#5c[#5c1h]:1-phenyl-1H-pyrrol-2-amine
 H1c[1p1c1h]:ethylphosphine

@@ -278,17 +278,33 @@ def FlexLoad(data, loader, dabapath, config, filename='./'):
                 atom.model_compound = data[modelname]
                 atom.set_active_invariom(invname)
             elif invname not in compounds.keys() and not atom.model_compound:
-                misses.append((atom.name, invname))
+                misses.append((atom, invname))
                 kill = True
                 printer('Trying dynamic invariom name for atom {}. {} not available'.format(atom.name, invname))
     printer()
     if kill:
-        # printer('Invarioms missing: Trying extra dynamic invarioms.')
-        # from apd.lib.crystgeom2.molgraph import getInvariomNames
-        # fittedNames = getInvariomNames(data['exp'], printer, databasePath=dabapath, set=misses)
-        # print fittedNames
+        for atom in misses:
+            atom = atom[0]
+            neighbours = cg.get_framework_neighbours(atom, useH=False)
+            if len(neighbours) > 1:
+                for atom2 in neighbours:
+                    if not atom2.get_active_invariom():
+                        print '2'
+                        message = 'Error: The following invarioms are missing in the database:\n'
+                        message += '\n'.join(['{:<6} <-> {:>}'.format(miss[0].name, miss[1]) for miss in misses])
+                        message += '\n\n!!!Terminating program due to fatal error: MISSING INVARIOMS!!!'
+                        core.apd_exit(message=message)
+                atom.tolerate()
+                printer('WARNING: Tolerating missing invariom for {}.'.format(atom.name))
+            else:
+                print '1'
+                message = 'Error: The following invarioms are missing in the database:\n'
+                message += '\n'.join(['{:<6} <-> {:>}'.format(miss[0].name, miss[1]) for miss in misses])
+                message += '\n\n!!!Terminating program due to fatal error: MISSING INVARIOMS!!!'
+                core.apd_exit(message=message)
+        return
         message = 'Error: The following invarioms are missing in the database:\n'
-        message += '\n'.join(['{:<6} <-> {:>}'.format(*miss) for miss in misses])
+        message += '\n'.join(['{:<6} <-> {:>}'.format(miss[0].name, miss[1]) for miss in misses])
         message += '\n\n!!!Terminating program due to fatal error: MISSING INVARIOMS!!!'
         core.apd_exit(message=message)
 
