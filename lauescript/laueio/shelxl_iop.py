@@ -25,7 +25,20 @@ class ShelxlAtom(object):
         self.part = part
         self.adp_updated = False
         self.prefix = prefix
+        self.bedeInstructions = None
+        self.loneInstructions = None
 
+    def setBedeInstructions(self, instructions):
+        self.bedeInstructions = instructions
+
+    def setLoneInstructions(self, instructions):
+        self.loneInstructions = instructions
+
+    def getBedeInstructions(self):
+        return self.bedeInstructions
+
+    def getLoneInstructions(self):
+        return self.loneInstructions
 
     def append(self, line):
         self.content.append(line.rstrip('\n'))
@@ -227,6 +240,8 @@ class ShelxlIOP(IOP):
             'REM',
             'Q',
             'END',
+            'BEDE',
+            'LONE',
     ]
     cmds = cmds + [cmd.swapcase() for cmd in cmds] + [cmd.title() for cmd in cmds]
 
@@ -236,6 +251,9 @@ class ShelxlIOP(IOP):
         self.activeChain = 0
         self.activeResidue = (0, '')
         self.residuesOfName = {}
+        self.bedeInstructions = {}
+        self.loneInstructions = {}
+        self.fvars = []
 
 
     def get_symmetry(self):
@@ -249,7 +267,6 @@ class ShelxlIOP(IOP):
 
     def add_fvar(self, value=0.5):
         self.fvar.append(str(value))
-
 
     def _build_fvar(self):
         if self.content[self.fvar_line].startswith('FVAR'):
@@ -265,6 +282,7 @@ class ShelxlIOP(IOP):
         return float(value.partition('(')[0]) + 273
 
     def parse(self):
+        end = False
         new_content = []
         self.atoms = {}
         current_AFIX = ''
@@ -280,7 +298,7 @@ class ShelxlIOP(IOP):
                     sfac_cart = [i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]
                     self.sfac_line = j
                 elif line.startswith('FVAR'):
-                    self.fvar = [i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]
+                    self.fvars += [i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]
                     self.fvar_line = j
                 elif line.startswith('TEMP'):
                     self.T = self.T_value([i for i in line.rstrip('\n').split(' ') if len(i) > 0][-1])
@@ -305,11 +323,15 @@ class ShelxlIOP(IOP):
                         self.residuesOfName[name].append(number)
                     except KeyError:
                         self.residuesOfName[name]= [number]
+                elif line.upper().startswith('BEDE') or line.upper().startswith('LONE'):
+                    self.registerBEDEInstruction(line[:-1], j)
 
+                elif line.upper().startswith('HKLF'):
+                    end = True
 
 
                 new_content.append(line.rstrip('\n'))
-            elif line[0] in ascii_letters:
+            elif line[0] in ascii_letters and not end:
                 atom = ShelxlAtom(line, sfac_cart, self.cell, part=part, prefix=current_AFIX, residue=self.activeResidue[0])
                 current_AFIX = ''
                 new_content.append(atom)
@@ -320,6 +342,7 @@ class ShelxlIOP(IOP):
                 except:
                     pass
         self.content = new_content
+        self._resolveBEDELONE()
         self._parse_atoms()
 
 
@@ -358,6 +381,69 @@ class ShelxlIOP(IOP):
                 self.adp_iso_frac[name] = adp
             self.names.append(name)
             self.element[name] = atom.get_element()
+            self.findBEDEInstructions(name, atom)
+
+    def findBEDEInstructions(self, atomName, atom):
+        bedes = []
+        try:
+            bedes += self.bedeInstructions[atomName]
+        except KeyError:
+            pass
+        try:
+            bedes += self.bedeInstructions['$' + atom.get_element()]
+        except KeyError:
+            pass
+
+        bedesByR = {}
+        for bede in bedes:
+            try:
+                bedesByR[bede['r']].append(bede)
+            except KeyError:
+                bedesByR[bede['r']] = [bede]
+
+        selectedBedes = []
+        for r, bedes in bedesByR.items():
+            firstP = 999
+            firstBEDE = None
+            for bede in bedes:
+                p = bede['priority']
+                if p < firstP:
+                    firstBEDE = bede
+                    firstP = p
+            selectedBedes.append(firstBEDE)
+        atom.setBedeInstructions(selectedBedes)
+
+        lones = []
+        try:
+            lones += self.loneInstructions[atomName]
+        except KeyError:
+            pass
+        try:
+            lones += self.loneInstructions['$' + atom.get_element()]
+        except KeyError:
+            pass
+
+        lonesByR = {}
+        for lone in lones:
+            try:
+                lonesByR[lone['r']].append(lone)
+            except KeyError:
+                lonesByR[lone['r']] = [lone]
+
+        selectedLones = []
+        for r, lones in lonesByR.items():
+            firstP = 999
+            firstLONE = None
+            for lone in lones:
+                p = lone['priority']
+                if p < firstP:
+                    firstLONE = lone
+                    firstP = p
+            selectedLones.append(firstLONE)
+        atom.setLoneInstructions(selectedLones)
+
+
+
 
     def set_cart(self, name, value):
         self.atoms[name].set_cart(value)
@@ -367,6 +453,84 @@ class ShelxlIOP(IOP):
 
     def set_afix(self, name, value):
         self.atoms[name].set_afix(value)
+
+    def registerBEDEInstruction(self, instruction, lineNumber):
+        cmd = instruction[:4].upper()
+        if cmd == 'BEDE':
+            self._parseBEDE(instruction, lineNumber)
+        else:
+            self._parseLONE(instruction, lineNumber)
+
+    def _parseBEDE(self, instr, lineNumber):
+        instr = [i for i in instr.split() if i]
+        if instr[-1][0] in ascii_letters:
+            instr = instr[:1] + instr[-2:] + instr[1:-2]
+        instr = {
+            'origin': instr[1],
+            'direction': instr[2],
+            'r': instr[3],
+            'A': self.toFVAR(instr[4]),
+            'U1': self.toFVAR(instr[5]),
+            'U2': self.toFVAR(instr[6]),
+            'priority': lineNumber}
+        try:
+            self.bedeInstructions[instr['origin']].append(instr)
+        except KeyError:
+            self.bedeInstructions[instr['origin']] = [instr]
+
+    def toFVAR(self, value):
+        fvalue = float(value)
+        if -15 > fvalue or fvalue > 15:
+            index = int(value.partition('.')[0][:-1])
+            factor = value.partition('.')
+            factor = factor[0][-1] + '.' + factor[2]
+            FVAR = (index, float(factor))
+            return FVAR
+        return float(value)
+
+    def resolveFVAR(self, FVAR):
+        if not type(FVAR) == tuple:
+            raise TypeError
+        fvar = float(self.fvars[FVAR[0]-1])
+        return fvar * FVAR[1]
+
+    def _parseLONE(self, instr, lineNumber):
+        instr = [i for i in instr.split() if i][1:]
+        for i, value in enumerate(instr):
+            try:
+                m = int(value)
+                break
+            except:
+                pass
+        try:
+            p = float(instr[i+5])
+        except:
+            p = None
+        instr = {'origin': instr[:i],
+                 'm': m,
+                 'A': self.toFVAR(instr[i+1]),
+                 'U1': self.toFVAR(instr[i+2]),
+                 'U2': self.toFVAR(instr[i+3]),
+                 'r': instr[i+4],
+                 'priority': lineNumber}
+        for origin in instr['origin']:
+            try:
+                self.loneInstructions[origin].append(instr)
+            except KeyError:
+                self.loneInstructions[origin] = [instr]
+
+    def _resolveBEDELONE(self):
+        for bedes in self.bedeInstructions.values() + self.loneInstructions.values():
+            for bede in bedes:
+                for key, param in bede.items():
+                    try:
+                        value = self.resolveFVAR(param)
+                    except TypeError:
+                        pass
+                    else:
+                        bede[key] = value
+
+
 
 
 if __name__ == '__main__':
