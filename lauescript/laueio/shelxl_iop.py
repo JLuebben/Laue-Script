@@ -4,12 +4,13 @@ Created on Mar 18, 2014
 @author: Arrahed
 """
 from string import ascii_letters
-
+import numpy as np
 from lauescript.cryst.transformations import frac2cart, \
     cart2frac, \
     frac2cart_ADP, \
     cart2frac_ADP
 from lauescript.laueio.io import IOP
+from lauescript.cryst.tables import covalence_radius
 
 
 class ShelxlAtom(object):
@@ -357,6 +358,17 @@ class ShelxlIOP(IOP):
         for atom in self.atoms.values():
             atom.build()
 
+    def buildConnectionTable(self):
+        connectionTable = {}
+        for atom1 in self.atoms.values():
+            for atom2 in self.atoms.values():
+                key = ':'.join(sorted([atom1.get_name(), atom2.get_name()]))
+                if np.linalg.norm(atom1.get_cart() - atom2.get_cart()) <= float(covalence_radius[atom1.get_element()])\
+                        + float(covalence_radius[atom2.get_element()]) + .1:
+                    connectionTable[key] = True
+                else:
+                    connectionTable[key] = False
+        self.connectionTable = connectionTable
 
     def _parse_atoms(self):
         self.cart = {}
@@ -381,6 +393,11 @@ class ShelxlIOP(IOP):
                 self.adp_iso_frac[name] = adp
             self.names.append(name)
             self.element[name] = atom.get_element()
+
+        # if self.bedeInstructions or self.loneInstructions:
+        #     self.buildConnectionTable()
+
+        for name, atom in self.atoms.items():
             self.findBEDEInstructions(name, atom)
 
     def findBEDEInstructions(self, atomName, atom):
@@ -394,6 +411,21 @@ class ShelxlIOP(IOP):
         except KeyError:
             pass
 
+        # bedesByOriginDirection = {}
+        # for bede in bedes:
+        #     direction = bede['direction']
+        #     if direction.startswith['$']:
+        #         directions = [a for a in self.atoms.values() if a.get_element == direction[1:] and
+        #                       self.connectionTable[':'.join(sorted([atom.get_name(), a.get_name()]))]]
+        #     else:
+        #         directions = [direction]
+        #     for direction in directions:
+        #         key = bede['origin'] + direction
+        #         try:
+        #             bedesByOriginDirection[key].append(bede)
+        #         except KeyError:
+        #             bedesByOriginDirection[key] = [bede]
+
         bedesByR = {}
         for bede in bedes:
             try:
@@ -403,14 +435,28 @@ class ShelxlIOP(IOP):
 
         selectedBedes = []
         for r, bedes in bedesByR.items():
-            firstP = 999
-            firstBEDE = None
+            firstPs = {bede['direction']: 99999 for bede in bedes}
+            print firstPs.keys()
+            elements = [p for p in firstPs.keys() if '$' in p]
+            for e in elements:
+                firstPs[e] = 99999
+            # firstP = 99999
+            firstBEDEs = []
             for bede in bedes:
                 p = bede['priority']
-                if p < firstP:
-                    firstBEDE = bede
-                    firstP = p
-            selectedBedes.append(firstBEDE)
+                direction = bede['direction']
+                if not '$' in direction:
+                        element = '$'+self.atoms[direction].get_element()
+                else:
+                    element = direction
+                if not element in firstPs.keys():
+                    element = direction
+                if p < firstPs[direction] and p < firstPs[element]:
+
+                    firstBEDEs.append(bede)
+                    firstPs[direction] = p
+            for firstBEDE in firstBEDEs:
+                selectedBedes.append(firstBEDE)
         atom.setBedeInstructions(selectedBedes)
 
         lones = []

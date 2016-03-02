@@ -122,7 +122,7 @@ class XDIOP(IOP):
         self.parse_master_file()
         self.atoms = {}
         self.body = []
-        self.current_atom_record = None
+        self.current_atom_record = []
         self.names = []
         self.adp_frac = {}
         self.adp_error_frac = {}
@@ -133,25 +133,31 @@ class XDIOP(IOP):
         self.element = {}
         self.multipoles = {}
         self.T = None
-        counter = -1
+        switch = False
+        counter = 0
         for raw_line in self.content:
+            if raw_line.startswith('USAGE'):
+                self.body.append(raw_line)
+                switch = True
+                continue
+            if not switch:
+                self.body.append(raw_line)
+                continue
             if not raw_line[0] == '!':
-                if counter == 0:
-                    self.parse_atom_record()
-                    counter -= 1
+                newRec = True if not raw_line[0] == ' ' else False
                 line = [i for i in raw_line[:-1].split(' ') if i]
-                if len(line) == 0:
-                    continue
-                if counter > 0:
+                if self.current_atom_record and newRec and '(' in self.current_atom_record[0] or counter > 3:
+                    self.parse_atom_record()
+                    counter = 0
+
+                # if len(line) == 0:
+                #     continue
+                if not newRec:
                     self.current_atom_record += line
-                    counter -= 1
+                    counter += 1
 
-                elif '(' in line[0] and ')' in line[0]:
-                    counter = 4
-
-                    self.current_atom_record = line
                 else:
-                    self.body.append(raw_line)
+                    self.current_atom_record = line
             else:
                 self.body.append(raw_line)
         for name, atom in self.atoms.items():
@@ -184,7 +190,6 @@ class XDIOP(IOP):
         atom.set_occupancy(float(rec[15]))
 
         atom.set_adp_frac([float(i) for i in rec[16:22]])
-
         atom.set_custom_attribute('multipoles', [float(i) for i in rec[22:]])
         self.atoms[rec[0]] = atom
         atom.set_cell(self.cell)

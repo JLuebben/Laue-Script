@@ -84,7 +84,7 @@ def storeData(data, filename='laue.dat'):
     Utility function for serializing data.
     :param data: Reference to the object to be stored.
     :param filename: String representing the filename that will be used.
-    Defaulst to 'laue.dat'.
+    Defaults to 'laue.dat'.
     :return: None
     """
     import cPickle
