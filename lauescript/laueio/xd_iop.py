@@ -146,7 +146,8 @@ class XDIOP(IOP):
             if not raw_line[0] == '!':
                 newRec = True if not raw_line[0] == ' ' else False
                 line = [i for i in raw_line[:-1].split(' ') if i]
-                if self.current_atom_record and newRec and '(' in self.current_atom_record[0] or counter > 3:
+                print self.current_atom_record, newRec, counter
+                if self.current_atom_record and newRec and '(' in self.current_atom_record[0]:# or counter > 3:
                     self.parse_atom_record()
                     counter = 0
 

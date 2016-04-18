@@ -91,6 +91,9 @@ covalence_radius = Covalence_radius()
 
 
 class Electro_negativity(Table):
+    """
+    Taken from Invariomtool source.
+    """
     data = {'H': 2.20, 'He': 5.50, 'Li': .97, 'Be': 1.47, 'B': 2.01, 'C': 2.50,
                    'N': 3.07, 'O': 3.50, 'F': 4.40, 'Ne': 4.80, 'Na': 1.01, 'Mg': 1.23,
                    'Al': 1.47, 'Si': 1.74, 'P': 2.06, 'S': 2.44, 'Cl': 2.83, 'Ar': 3.20,

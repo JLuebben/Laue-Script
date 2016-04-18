@@ -411,21 +411,6 @@ class ShelxlIOP(IOP):
         except KeyError:
             pass
 
-        # bedesByOriginDirection = {}
-        # for bede in bedes:
-        #     direction = bede['direction']
-        #     if direction.startswith['$']:
-        #         directions = [a for a in self.atoms.values() if a.get_element == direction[1:] and
-        #                       self.connectionTable[':'.join(sorted([atom.get_name(), a.get_name()]))]]
-        #     else:
-        #         directions = [direction]
-        #     for direction in directions:
-        #         key = bede['origin'] + direction
-        #         try:
-        #             bedesByOriginDirection[key].append(bede)
-        #         except KeyError:
-        #             bedesByOriginDirection[key] = [bede]
-
         bedesByR = {}
         for bede in bedes:
             try:
