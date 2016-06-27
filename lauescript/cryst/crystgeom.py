@@ -79,7 +79,7 @@ def Uiso(adp, mean='geometric'):
         elif mean == 'arithmetic':
             return sum(eigvals) / 3.
         else:
-            print 'crystgeom: Error: please specify mean as \'geometric\' or \'arithmetic\''
+            print('crystgeom: Error: please specify mean as \'geometric\' or \'arithmetic\'')
             exit()
     except:
         return adp
@@ -312,8 +312,8 @@ def read_meas_adp(data, path='xd.res', use='meas'):
         if switch:
             split = [i for i in line.split(' ') if len(i) > 0]
             if not len(split) == 6:
-                print 'WARNING!!! Inconsistend number of floats while\
-                       reading measured ADP.'
+                print('WARNING!!! Inconsistend number of floats while\
+                       reading measured ADP.')
             data['exp'][atomname].adp[use2] = split
             switch = False
         if '(' in line:
@@ -323,7 +323,7 @@ def read_meas_adp(data, path='xd.res', use='meas'):
                 atomname = split[0]
     use = 'cart_' + use
     for atom in data['exp'].atoms:
-        if use == 'cart_neut': print atom
+        # if use == 'cart_neut': print(atom)
         atom.adp[use] = rotate_adp2(atom.adp[use2],
                                     atom.molecule.frac2cartmatrix,
                                     atom.molecule.cell)
@@ -666,7 +666,7 @@ def get_closest_neighbours(atomlist, neighbours=2):
     The argument is a list as returned by frac_to_cart and the number of neighbours to be
     returned.
     """
-    print 'atomlist', atomlist
+    print('atomlist', atomlist)
     neighbourlist = []
     for atom in atomlist:
         listline = [atom[0][0]]
@@ -676,7 +676,7 @@ def get_closest_neighbours(atomlist, neighbours=2):
             dists.append(np.linalg.norm(atom[1] - partner[1]))
             distsc.append(np.linalg.norm(atom[1] - partner[1]))
         dists.remove(min(dists))
-        for _ in xrange(neighbours):
+        for _ in range(neighbours):
             if min(dists) < 2.5:
                 listline.append(atomlist[distsc.index(min(dists))][0][0])
                 dists.remove(min(dists))

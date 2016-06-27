@@ -104,7 +104,7 @@ class Electro_negativity(Table):
                    'Rb': .89,
             'D': 2.20}  # , 99, 111, 122, 123, 130, 136, 142, 145, 130, 142, 146, 149, 172, 182, 201, 221, 240, 86, 97, 108, 108, 107, 107, 107, 107, 110, 111, 110, 110, 110, 111, 111, 106, 114, 123, 133, 140, 146, 152, 155, 142, 142, 144, 144, 155, 167 }
     def __getitem__(self, item):
-        print 'x'
+        # print 'x'
         item = item.rstrip('-+')
         item = item.capitalize()
         return super(Electro_negativity, self).__getitem__(item)

@@ -35,8 +35,10 @@ class Loader(object):
              'pdb': ['CRYST1', 'SCALE1', 'SCALE2', 'SCALE3', 'ATOM  ', 'HETATM', 'ANISOU', 'REMARK']}
     read_files = []
 
-    def __init__(self, printer):
+    def __init__(self, printer=None):
         self.printer = printer
+        # if not printer:
+        #     self.printer = print
         self.IOP = None
 
     @staticmethod

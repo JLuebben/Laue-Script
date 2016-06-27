@@ -421,7 +421,7 @@ class ShelxlIOP(IOP):
         selectedBedes = []
         for r, bedes in bedesByR.items():
             firstPs = {bede['direction']: 99999 for bede in bedes}
-            print firstPs.keys()
+            # print firstPs.keys()
             elements = [p for p in firstPs.keys() if '$' in p]
             for e in elements:
                 firstPs[e] = 99999
@@ -573,4 +573,4 @@ if __name__ == '__main__':
     for atom in test.atoms.values():
         if atom.get_element() == 'H':
             atom.set_afix('AFIX 666')
-    print test
+    # print test

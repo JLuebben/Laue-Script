@@ -125,4 +125,4 @@ class CIFIOP(IOP):
 if __name__ == '__main__':
     test = CIFIOP('bats.cif')
     test.read()
-    print test.get_cart()
+    print(test.get_cart())

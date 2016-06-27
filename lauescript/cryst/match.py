@@ -115,8 +115,8 @@ def get_transformation(cloud1, cloud2, matchlist):
     :param cloud2: ...
     :param matchlist: ...
     """
-    print 'Please don\'t use me. I am an innocent function in the \'match\' module and I am only kept alive because'\
-          'someone else might still be using me.'
+    print('Please don\'t use me. I am an innocent function in the \'match\' module and I am only kept alive because'\
+          'someone else might still be using me.')
     cloud22 = [cloud2[i] for i in matchlist]
     p1 = cloud1[0]
     p2 = cloud1[-1]
@@ -383,10 +383,10 @@ def test():
                 no += 1
             if not x == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]:
                 wrong += 1
-        print 'No solutions:', no
-        print 'wrong solution:', wrong
-        print 'Cycles:', tries
-        print 'Success:', (1 - float(wrong) / float(tries)) * 100, '%'
+        print('No solutions:', no)
+        print('wrong solution:', wrong)
+        print('Cycles:', tries)
+        print('Success:', (1 - float(wrong) / float(tries)) * 100, '%')
         # =======================================================================
         # print
         # nc= rotate_by_matrix(rotated_cloud,xx[1])
@@ -411,7 +411,7 @@ def test():
     #===============================================================================
     test_match_clouds()
     end = time.time()
-    print end - start
+    print(end - start)
 
 
 if __name__ == '__main__':

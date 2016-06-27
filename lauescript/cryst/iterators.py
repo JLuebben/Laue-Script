@@ -1,14 +1,17 @@
 __author__ = 'jens'
 
-import cPickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle as pickle
 from os.path import join
-from geom import get_framework_neighbors
+from lauescript.cryst.geom import get_framework_neighbors
 
 
 def database(pluginManager):
     path = pluginManager.config.get('APD', 'DatabasePath')
     picklepointer = open(join(path, 'database.pkl'), 'r')
-    data = cPickle.load(picklepointer)
+    data = pickle.load(picklepointer)
     picklepointer.close()
     return data.values()
 

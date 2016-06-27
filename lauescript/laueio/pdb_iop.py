@@ -125,8 +125,8 @@ class PDBAtom(AtomInterface):
         try:
             return self.point_charge
         except AttributeError:
-            print 'pdb_iop.py ERROR: No point charge available for atom:\n {}'.format(str(self)[:-1])
-            print 'Setting value to zero.'
+            print('pdb_iop.py ERROR: No point charge available for atom:\n {}'.format(str(self)[:-1]))
+            print('Setting value to zero.')
             return 0
 
     def set_adp_cart(self, adp):
@@ -522,7 +522,6 @@ class PDBIOP(IOP):
 if __name__ == '__main__':
     test = PDBIOP('kcross_set0001.pdb')
     test.read()
-    print test
     exit()
     #test.write_PQR()
 
@@ -566,4 +565,4 @@ if __name__ == '__main__':
     test.set(['point_charges', 'cart', 'serial_numbers', 'name_prefixes', 'residue_numbers', 'occupancies',
               'adp_cart'], provide, True)
 
-    print test.export('PQR')
+    print(test.export('PQR'))

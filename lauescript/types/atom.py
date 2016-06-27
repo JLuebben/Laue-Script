@@ -14,7 +14,7 @@ from lauescript.cryst.tables import halogens, elementofnumber
 from lauescript.cryst.geom import get_framework_neighbors
 import lauescript.cryst.crystgeom as cg
 from lauescript.core.core import apd_exit
-from adp import ADP
+from lauescript.types.adp import ADP
 
 
 class NoADPError(Exception):
@@ -353,7 +353,7 @@ class ATOM(AtomInterface):
         if self.invariom_name[1] is '@':
             self.prochiral = False
             if self.invariom_name[2] is '3':
-                print 'Warning! Approximating ADP in 3 membered ring for atom {}.'.format(self.name)
+                print('Warning! Approximating ADP in 3 membered ring for atom {}.'.format(self.name))
             return
         if not get_framework_neighbors(atom=self, useH=True):
             self.prochiral = False
@@ -392,8 +392,8 @@ class ATOM(AtomInterface):
         Calculates all intramolecular distances.
         """
         if not self.molecule:
-            print 'ERROR in atom.get_distances(): Atom {} is not part of ' \
-                  'a molecule.'.format(self.name)
+            print('ERROR in atom.get_distances(): Atom {} is not part of ' \
+                  'a molecule.'.format(self.name))
             exit()
         neighbors = []
         for atom2 in self.molecule.atoms:
@@ -423,7 +423,7 @@ class ATOM(AtomInterface):
             #     adp +=
 
         if not self.invariom:
-            print self.invariom, self, 'Error in atom.transfer_adp()'
+            print(self.invariom, self, 'Error in atom.transfer_adp()')
             exit()
         elif self.orientation[0] is not None and len(self.invariom.orientation) == 2 and len(
                 self.orientation) == 2:
@@ -446,7 +446,7 @@ class ATOM(AtomInterface):
         self.adp['cart_int'] = ADP_to_XD_list(
             dot(dot(transformation.T, ADP_to_matrix(matched_atom.adp['cart_int'])), transformation))
         if any([num > 1 or num < -1 for num in self.adp['cart_int']]):
-            print 'Warning!: atom.py: {} ADP too large. Using average of all values.'.format(self.name)
+            print('Warning!: atom.py: {} ADP too large. Using average of all values.'.format(self.name))
             adps = [atom.invariom.adp['cart_int'] for atom in self.molecule.atoms if
                     all([num < 1 or num > -1 for num in self.adp['cart_int']])]
             self.adp['cart_int'] = sum(adps) / len(adps)
@@ -471,7 +471,7 @@ class ATOM(AtomInterface):
 
         keep = w.tolist().index(min(w))
         vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
-        print vectors
+        # print(vectors)
 
         value = 0
         for i in xrange(3):
@@ -482,18 +482,18 @@ class ATOM(AtomInterface):
             if not i == keep:
                 w[i] = value
         v = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
-        print vectors
+        # print vectors
         adp = matrix([[v[0][0], v[1][0], v[2][0]],
                       [v[0][1], v[1][1], v[2][1]],
                       [v[0][2], v[1][2], v[2][2]]])
         adp = (adp + adp.T) / 2
-        print adp
+        # print adp
 
         w, v = eig(adp)
 
         keep = w.tolist().index(min(w))
         vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
-        print vectors
+        # print vectors
 
     def iter_bound_atoms(self):
         return get_framework_neighbors(self)

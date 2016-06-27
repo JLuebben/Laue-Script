@@ -8,7 +8,10 @@ Class implementing the plugin manager.
 import imp
 from sys import argv
 from os import listdir
-from ConfigParser import ConfigParser
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 from lauescript.core.apd_printer import apd_printer
 from sys import exit
 
@@ -537,8 +540,8 @@ class PluginManager(object):
                     value = self.plugins[self.current_action].OPTION_ARGUMENTS[key]
                 except TypeError:
                     value = None
-                    print 'Warning: OPTION_ARGUMENTS in module {} should be a dictionary type.'\
-                        .format(self.plugins[self.current_action].__file__)
+                    print('Warning: OPTION_ARGUMENTS in module {} should be a dictionary type.'\
+                        .format(self.plugins[self.current_action].__file__))
 
         return value
 

@@ -87,8 +87,8 @@ class IOP(object):
         return self.cell
 
     def get_symmetry(self):
-        print 'Symmetry is not available in all file types.'
-        print 'Override this method in IOPs that support symmetry.'
+        print('Symmetry is not available in all file types.')
+        print('Override this method in IOPs that support symmetry.')
 
     def clone(self, filename):
         """

@@ -87,3 +87,13 @@ C2o~o[1h]@6c:C~o~o@6c
 #6-O#66c[#66c#6c]#6c[#6c@6c]:6-O#66c[#66c#6c]#6c[@6c#6c] Fix me!!!!!
 
 S1s[1c]1c[1c1h1h]:S1s1h
+
+N~c[2o1o]@6c1c:N@6c1c1c
+C2o~n[@6c1c]1o:C2o1o1n
+
+P~s@6c1c[1c1c1h]1c[1c1c1h]:P~s@6c1c[1h1h1h]1c[1h1h1h]
+P~s@6c@6c1c[@6c]:P~s@6c@6c1c[1h1h1h]
+6-C~c[1p]#6c[#6c1h]#6c[#6c]:6-C#6c[#6c1h]#6c[#6c1h]1c
+6-C#6c[~c#6c]#6c[#6c1h]:6-C#6c[~c#6c]#6c[#6c1h]1c
+
+H1c[1n1c]:H1c[1n1c1h]

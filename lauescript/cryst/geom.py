@@ -7,9 +7,9 @@ Module for simple geometry operations.
 """
 import numpy as np
 
-from tables import covalence_radius, electro_negativity
-from match import get_transform
-from crystgeom import get_adp_as_matrix
+from lauescript.cryst.tables import covalence_radius, electro_negativity
+from lauescript.cryst.match import get_transform
+from lauescript.cryst.crystgeom import get_adp_as_matrix
 
 
 # def bond_error(cart1, cart2, err1, err2):

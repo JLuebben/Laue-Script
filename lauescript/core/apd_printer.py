@@ -192,9 +192,9 @@ class apd_printer(object):
 
         else:
             for value in args:
-                print self.line_start + str(value).replace('\n', self.line_break)
+                print(self.line_start + str(value).replace('\n', self.line_break))
             if not args:
-                print self.line_start
+                print(self.line_start)
 
     def _write(self, string, filename):
         """
@@ -241,7 +241,7 @@ class apd_printer(object):
         Called at the beginning by the main program so start the
         indentation line.
         """
-        print '_'
+        print('_')
 
     def last(self):
         """
@@ -250,31 +250,31 @@ class apd_printer(object):
         Also the self.release() method is called to restore
         sys.stdout if necessary.
         """
-        print '_|'
+        print('_|')
         self.release()
 
     def enter(self):
         """
         Increase the indentation line.
         """
-        print self.line_start[:-7] + '|'
-        print self.line_start[:-7] + '|----|'
-        print self.line_start[:-7] + '     |'
+        print(self.line_start[:-7] + '|')
+        print(self.line_start[:-7] + '|----|')
+        print(self.line_start[:-7] + '     |')
 
     def exit(self):
         """
         Decrease the indentation line.
         """
-        print self.line_start[:-7] + '     |'
-        print self.line_start[:-7] + '|----|'
-        print self.line_start[:-7] + '|'
+        print(self.line_start[:-7] + '     |')
+        print(self.line_start[:-7] + '|----|')
+        print(self.line_start[:-7] + '|')
 
     def spacer(self):
         """
         Prints a spacer to optically seperate parts of
         the output.
         """
-        print self.line_start + '        ------|------'
+        print(self.line_start + '        ------|------')
 
     def headline(self, custom=False):
         """
@@ -303,7 +303,7 @@ class apd_printer(object):
         Prints the correctly indented string passed as argument
         and adds an 'carriage return'.
         """
-        print self.line_start + str(value) + '\r',
+        print(self.line_start + str(value) + '\r',)
         stdout.flush()
 
     def create_progressbar(self, length=None):
