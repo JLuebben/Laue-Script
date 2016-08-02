@@ -128,7 +128,8 @@ class DATA(dict):
         :param args: ...
         :param kwargs: ...
         """
-        self._link()
+        if match == 'inv':
+            self._link()
         self._get_atoms()
         self._get_distances()
         self._find_molecules()

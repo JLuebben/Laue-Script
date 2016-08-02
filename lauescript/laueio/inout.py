@@ -97,13 +97,14 @@ def read_database2(data, dabapointer, invlist):  #,invdict,atomlist):
                 data[mol].atoms[-1].give_adp(key='cart_int', value=adp)
 
 
-def read_database(data, database, invlist):
-    reader = DatabaseReader(database)
+def read_database(data, database, invlist, readAll=False):
+    reader = DatabaseReader(database, readAll=readAll)
     reader.read(data, invlist)
 
 
 class DatabaseReader(object):
-    def __init__(self, database):
+    def __init__(self, database, readAll=False):
+        self.readAll = readAll
         self.daba = database
         self.reset()
 
@@ -148,9 +149,11 @@ class DatabaseReader(object):
 
     def _parse_N(self, line):
         self.reset()
-        if any([line == inv for inv in self.invlist]):
+        if any([line == inv for inv in self.invlist]) or self.readAll:
             self.compound = line
             self.hit = True
+        if self.readAll:
+            self.data.give_daba_molecule(line)
 
     def _parse_E(self, line):
         self.element = line
@@ -207,7 +210,7 @@ def read_experimental_coordinates(data):
 
 
 
-def FlexLoad(data, loader, dabapath, config, filename='./'):
+def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False):
     """
     A more flexible variation of the 'Load' function.
 
@@ -251,14 +254,16 @@ def FlexLoad(data, loader, dabapath, config, filename='./'):
 
     database = dabapointer.readlines()
     printer()
-
+    if noTransfer:
+        read_database(data, database, invlist=[], readAll=True)
+        return
+    correctionsPointer = open(dabapath + '/empirical_corrections.txt')
     for invdict, orientations, compounds in invstring.get_invariom_names(names=[i.name for i in data['exp'].atoms],
                                                                          cart=[i.cart for i in data['exp'].atoms],
                                                                          dictionary=True,
                                                                          orientations=True,
                                                                          compounds=open(dabapath + '/APD_MAP.txt'),
-                                                                         corrections=open(dabapath +
-                                                                                          '/empirical_corrections.txt'),
+                                                                         corrections=correctionsPointer,
                                                                          dynamic=True,
                                                                          output=printer,
                                                                          verbose=False,

@@ -314,7 +314,7 @@ class ShelxlIOP(IOP):
                     current_AFIX = line
                 elif line.upper().startswith('RESI'):
                     words = line.rstrip('\n').split()
-                    number = int(words[1])
+                    number = words[1]
                     try:
                         name = words[2]
                     except IndexError:

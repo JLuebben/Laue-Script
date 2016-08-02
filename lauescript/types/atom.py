@@ -300,7 +300,7 @@ class ATOM(AtomInterface):
     def give_adp(self, key, value, error=None):
         if value is not None:
             self.adp[key] = array(value)
-            if len(value) == 1:
+            if type(value) == float:
                 self.adp['flag'] = 'iso'
             if error:
                 self.adp[key + '_error'] = array(error)

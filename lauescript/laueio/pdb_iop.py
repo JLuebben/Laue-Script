@@ -343,6 +343,7 @@ class PDBIOP(IOP):
         u23 = float(line[63:70]) * 10 ** -4
         adp = array([u11, u22, u33, u12, u13, u23])
         self.molecule[name].set_adp_cart(adp)
+        # print self.molecule[name]
         return ''
 
     @staticmethod

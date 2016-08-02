@@ -14,6 +14,11 @@ from lauescript.laueio.pdb_iop import PDBIOP
 from lauescript.types.molecule import MOLECULE
 from lauescript.core.core import apd_exit
 
+class DummyPrinter(object):
+    def __call__(self, *args):
+        string = ' '.join (args)
+        print(string)
+
 
 class Loader(object):
     """
@@ -37,8 +42,8 @@ class Loader(object):
 
     def __init__(self, printer=None):
         self.printer = printer
-        # if not printer:
-        #     self.printer = print
+        if not printer:
+            self.printer = DummyPrinter()
         self.IOP = None
 
     @staticmethod
