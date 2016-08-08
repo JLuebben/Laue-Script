@@ -6,8 +6,9 @@ Created on 08.02.2014
 Module for formatting ASCII output while giving feedback
 on the current execution state of the program.
 """
-
+from __future__ import print_function
 from sys import stdout
+
 
 
 class apd_table(object):
@@ -303,7 +304,7 @@ class apd_printer(object):
         Prints the correctly indented string passed as argument
         and adds an 'carriage return'.
         """
-        print(self.line_start + str(value) + '\r',)
+        print(self.line_start + str(value), end='\r')
         stdout.flush()
 
     def create_progressbar(self, length=None):

@@ -346,8 +346,8 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     else:
         printer = apd_printer
     errorlog = open('error.log', 'w')
-    if not root:
-        root = '/Euros/NEUE_Datenbank/Modellverbindungen'
+    # if not root:
+    #     root = '/Euros/NEUE_Datenbank/Modellverbindungen'
     #===========================================================================
     # root='/home/jens/generator_test'
     #===========================================================================
