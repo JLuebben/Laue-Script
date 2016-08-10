@@ -641,15 +641,23 @@ def generate_micro_database(data,
     filepointer = open(path)
     switch = False
     matrix_buffer = None
+    countSwitch = 0
+    counter = 0
     for line in filepointer.readlines():
+        if countSwitch > 0 and 'Variables:' in line:
+            countSwitch = -1
+        if countSwitch > 0 and line.rstrip().endswith('H'):
+            counter += 1
+        if countSwitch == 0 and 'VAL ONIOM calculation' in line:
+            countSwitch = 1
         if switch and 'Rotational constants' in line:
             switch = False
         elif switch:
             matrix_buffer.append(line.rstrip('\n'))
         elif 'Coordinates (Angstroms)' in line:
             switch = True
-            matrix_buffer = Log_Buffer(clustersize, data, path, frequency_cutoff, printer, frequency_scale)
-
+            matrix_buffer = Log_Buffer(clustersize, data, path, frequency_cutoff, printer, frequency_scale, atoms=counter)
+    printer('Number of atoms: {}'.format(counter))
     matrix_buffer.flush()
     printer.bottomline('             Database generation completed            ')
 
@@ -657,10 +665,11 @@ def generate_micro_database(data,
 class Log_Buffer(list):
     exclude = ['Number', 'Type', '-----']
 
-    def __init__(self, clustersize, data, path, frequency_cutoff, printer, frequency_scale):
+    def __init__(self, clustersize, data, path, frequency_cutoff, printer, frequency_scale, atoms=None):
         self.data = data
         self.frequency_cutoff = frequency_cutoff
         self.path = path
+        self.atoms = atoms
         self.printer = printer
         self.clustersize = clustersize
         self.errorlog = open('error.log', 'w')
@@ -677,7 +686,8 @@ class Log_Buffer(list):
         self.data.update(self.errorlog, self.printer, parallel=False)
 
     def find_pattern(self):
-        num_atoms = len(self) / self.clustersize
+        # num_atoms = len(self) / self.clustersize
+        num_atoms = self.atoms
         self.molecule = self[:num_atoms]
 
     def setup_data(self):

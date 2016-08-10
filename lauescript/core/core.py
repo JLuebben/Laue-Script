@@ -43,7 +43,7 @@ def apd_exit(value=1, message=None, verbose=True):
             fp.close()
         files = files.replace('\'', '###').replace('\"', '####')
 
-    if dosend:
+    if dosend and value:
         report = error.createReport(format_exc(), fileContent=files)
         try:
             error.sendReport(report, config)

@@ -11,9 +11,10 @@ most of their properties.
 import operator
 
 from lauescript.types.molecule import MOLECULE, DABA_MOLECULE
-from lauescript.cryst.match import match_point_clouds
+from lauescript.cryst.match import match_point_clouds, get_transform
 from lauescript.cryst.geom import is_bound
 from lauescript.cryst.sort import SortAtom
+from lauescript.core.core import apd_exit
 from sys import platform
 
 
@@ -143,6 +144,10 @@ class DATA(dict):
             self._transfer_adp()
         elif match == 'geom':
             self._match_molecules()
+        elif match == 'trust':
+            self._trust_molecules()
+        else:
+            apd_exit(1, 'Unknown ADP transfer method. Use inv/geom/trust.')
         self._update_H_ADP()
 
     def _find_molecules(self):
@@ -155,6 +160,13 @@ class DATA(dict):
         for i, atom in enumerate(self['exp'].atoms):
             print atom.element, self['micro'].atoms[hitlist[i]].element,hitlist[i],self['micro'].atoms[hitlist[i]].name
             atom.transfer_matched_ADP(self['micro'].atoms[hitlist[i]], transformation)
+
+    def _trust_molecules(self):
+        cloud1 = self['exp'].coords()[:3]
+        cloud2 = self['micro'].coords()[:3]
+        transformation = get_transform(cloud1, cloud2, matrix=True)
+        for i, atom in enumerate(self['exp'].atoms):
+            atom.transfer_matched_ADP(self['micro'].atoms[i], transformation)
 
     def _update_H_ADP(self):
         """
