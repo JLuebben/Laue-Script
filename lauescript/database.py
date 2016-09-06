@@ -643,7 +643,37 @@ def generate_micro_database(data,
     matrix_buffer = None
     countSwitch = 0
     counter = 0
+    readZMatrix = False
+    ZMatrixCounter = 0
+    readConstants = 0
     for line in filepointer.readlines():
+        # Identify core atoms and pseudo molecules in Z-matrix.
+        if readZMatrix and 'Variables:' in line:
+            readZMatrix = False
+        if 'Symbolic Z-matrix:' in line:
+            readZMatrix = True
+        elif readZMatrix and line.strip().endswith('H'):
+            ZMatrixCounter += 1
+            sLine = line.strip().split()
+            params = sLine[2:-1]
+            name = sLine[0]
+            ProtoAtom(name, *params)
+        elif readZMatrix and line.startswith(' X--'):
+            ZMatrixCounter += 1
+            sLine = line.strip().split()
+            params = sLine[2:-1]
+            name = sLine[0]
+            ProtoAtom(name, *params).setID(ZMatrixCounter)
+        elif readZMatrix and line.strip().endswith('L'):
+            ZMatrixCounter += 1
+        # -------------
+        if readConstants > 0 and 'GradGradGrad' in line:
+            readConstants = -1
+        elif readConstants == 0 and 'Constants:' in line:
+            readConstants = 1
+        elif readConstants > 0:
+            ProtoAtom.resolveReferences(line)
+
         if countSwitch > 0 and 'Variables:' in line:
             countSwitch = -1
         if countSwitch > 0 and line.rstrip().endswith('H'):
@@ -660,6 +690,75 @@ def generate_micro_database(data,
     printer('Number of atoms: {}'.format(counter))
     matrix_buffer.flush()
     printer.bottomline('             Database generation completed            ')
+    # for a in ProtoAtom.coreAtoms:
+    #     print a
+    # print 'x'
+    # for a in ProtoAtom.pseudoMolecules:
+    #     print a
+
+
+class ProtoAtom(object):
+    counter = 0
+    instances = []
+    coreAtoms = []
+    pseudoMolecules = []
+    atomByID = {}
+    referenceTable = {}
+    def __init__(self, name, xVar, yVar, zVar):
+        self.name = name
+        self.xVar = xVar
+        self.yVar = yVar
+        self.zVar = zVar
+        self.ID = None
+        self.disps = {}
+        self.x, self.y, self.z = None, None, None
+        ProtoAtom.referenceTable[xVar] = self
+        ProtoAtom.referenceTable[yVar] = self
+        ProtoAtom.referenceTable[zVar] = self
+        self.counter = ProtoAtom.counter
+        ProtoAtom.counter += 1
+        ProtoAtom.instances.append(self)
+        if name.startswith('X--'):
+            ProtoAtom.pseudoMolecules.append(self)
+        else:
+            ProtoAtom.coreAtoms.append(self)
+
+    def setID(self, ID):
+        self.ID = ID
+        ProtoAtom.atomByID[ID] = self
+
+    def __str__(self):
+        return '{}-{} {} {} {}'.format(self.counter, self.name, self.x, self.y, self.z)
+
+    def setValue(self, var, value):
+        self.__dict__[var[0]] = value
+
+    def addDisplacement(self, coord, freq, disp):
+        sfreq = '{}:{}'.format(freq.number, freq.freq)
+        if int(coord) == 1:
+            self.disps[sfreq] = [freq.mass, float(disp),None, None]
+        else:
+            self.disps[sfreq][int(coord)] = float(disp)
+        # if int(coord) == 3:
+        #     print self, sfreq, self.disps[sfreq], self.ID
+
+
+    @staticmethod
+    def numberOfCoreAtoms():
+        return len(ProtoAtom.coreAtoms)
+
+    @staticmethod
+    def resolveReferences(line):
+        try:
+            var, value = line.strip().split()
+        except ValueError:
+            return
+        try:
+            reference = ProtoAtom.referenceTable[var]
+        except KeyError:
+            pass
+        else:
+            reference.setValue(var, float(value))
 
 
 class Log_Buffer(list):
@@ -693,8 +792,12 @@ class Log_Buffer(list):
     def setup_data(self):
         self.data.give_daba_molecule('micro', properties=[0, 0, 0, 0])
         self.data.set_temperature([100])
-        datalist = read_frequency_block(self.path, self.errorlog)
-        frequency_data = extract_single_freqency(datalist, 'micro', self.frequency_cutoff)
+        # datalist = read_frequency_block(self.path, self.errorlog)
+        # frequency_data = extract_single_freqency(datalist, 'micro', self.frequency_cutoff)
+        # frequency_data = extract_single_freqency(datalist, 'micro', -9999)
+        FrequencyReader(self.path)
+        # for x in frequency_data:
+        #     print str(x)[:50]
         positions_list = []
         atom_names_list = []
         for atom_data in self.molecule:
@@ -721,18 +824,144 @@ class Log_Buffer(list):
 
 
 
-            for j, freq in enumerate(frequency_data[freq_num * -1:]):
-                if len(freq) > 3:
-                    #===========================================================
-                    # print
-                    # for f in freq[6:]:
-                    #     if f>.1:
-                    #         print f
-                    #===========================================================
-                    if atom_name == atom_names_list[0]:
-                        if not freq[0] > 99999:
-                            self.data['micro'].freq.append([freq[0] * self.frequency_scale, freq[1]])
-                    num = len(self.data['micro'].atoms) - 1
-                    if not freq[0] > 99999:
-                        self.data['micro'].atoms[-1].add_disps(freq[0] * self.frequency_scale,
-                                                               freq[4 + num * 3:7 + num * 3])
+            # for j, freq in enumerate(frequency_data[freq_num * -1:]):
+            #     if len(freq) > 3:
+            #         if atom_name == atom_names_list[0]:
+            #             if not freq[0] > 99999:
+            #                 self.data['micro'].freq.append([freq[0] * self.frequency_scale, freq[1]])
+            #                 print freq[0], freq[1]
+            #         num = len(self.data['micro'].atoms) - 1
+            #         if not freq[0] > 99999:
+            #             self.data['micro'].atoms[-1].add_disps(freq[0] * self.frequency_scale,
+            #                                                    freq[4 + num * 3:7 + num * 3])
+
+            atom = self.data['micro'].atoms[-1]
+            for freq, disps in ProtoAtom.coreAtoms[i].disps.items():
+                if disps[0] == 99999999:
+                    continue
+
+                freq = float(freq.split(':')[1])
+                if freq < self.frequency_cutoff:
+                    continue
+                atom.add_disps(freq * self.frequency_scale, disps[1:])
+                if i==0:
+                    # if not freq > 99999:
+                    # print freq * self.frequency_scale, disps[0]
+                    self.data['micro'].freq.append([freq * self.frequency_scale, disps[0]])
+
+        # Add PseudoMolecules
+        for i, pseudoMol in enumerate(ProtoAtom.pseudoMolecules):
+            name = 'pseudo{}'.format(i)
+            self.data.give_daba_molecule(name , properties=[0, 0, 0, 0])
+            self.data[name].give_atom(name=name+'atom',
+                                         element='H',
+                                         cart=[pseudoMol.x, pseudoMol.y, pseudoMol.z],
+                                         molecule=self.data[name])
+            atom = self.data[name].atoms[0]
+            for freq, disps in pseudoMol.disps.items():
+                if disps[0] == 99999999:
+                    continue
+
+                freq = float(freq.split(':')[1])
+                # if freq < self.frequency_cutoff:
+                #     continue
+                # print freq, disps
+                atom.add_disps(freq * self.frequency_scale, disps[1:])
+                # if not freq > 99999:
+                # print freq * self.frequency_scale, disps[0]
+                self.data[name].freq.append([freq * self.frequency_scale, disps[0]])
+
+
+
+class FrequencyReader(object):
+    def __init__(self, fileName):
+        self.counter = 1
+        self.frequencies = {}
+        self.buffer = []
+        self.columnMap = {}
+        tryblock = False
+        with open(fileName, 'r') as fp:
+            for line in fp.readlines():
+                if 'Harmonic frequencies (cm**-1)' in line:
+                    tryblock = False
+                if ' Coord Atom Element:' in line:
+                    tryblock = True
+                if 'Frequencies ---' in line:
+                    if self.buffer:
+                        self.flush()
+                    self.bufferFrequencies(line)
+                elif 'Reduced masses ---' in line:
+                    self.parseMasses(line)
+                elif tryblock:
+                    try:
+                        int(line[3])
+                        int(line[9])
+                        int(line[15])
+                    except:
+                        pass
+                    else:
+                        self.parseDisplacements(line)
+
+
+    def bufferFrequencies(self, line):
+        self.columnMap = {}
+        line = [f for f in line.strip().split()[2:]]
+        for i, freq in enumerate(line):
+            self.columnMap[i] = self.counter
+            self.frequencies[self.counter] = Frequency(freq, self.counter)
+            self.counter += 1
+        # print self.columnMap.items()
+
+    def parseMasses(self, line):
+        line = line.split('---')[1][1:-1]
+        i = 0
+        chunks = []
+        while True:
+            chunk = line[i:i+10]
+            i += 10
+            if not chunk:
+                break
+            try:
+                chunk = float(chunk)
+            except ValueError:
+                chunk = 99999999
+            chunks.append(chunk)
+        for i, mass in enumerate(chunks):
+            self.frequencies[self.columnMap[i]].addMass(mass)
+
+    def parseDisplacements(self, line):
+        line = [i for i in line.strip().split() if i]
+        coord, atom, element = line[:3]
+        disps = line[3:]
+        # print atom, disps
+        for i, disp in enumerate(disps):
+            self.frequencies[self.columnMap[i]].addDisplacement(atom, coord, disp)
+
+
+class Frequency(object):
+    def __init__(self, freq, number):
+        self.number = number
+        self.freq = float(freq)
+        self.coreAtoms = ProtoAtom.coreAtoms
+        self.displacements = []
+
+    def addMass(self, mass):
+        self.mass = mass
+        # print self.freq, self.mass
+
+    def addDisplacement(self, atom, coord, disp):
+        self.displacements.append(disp)
+        atom = int(atom) -1
+        try:
+            protoAtom = self.coreAtoms[atom]
+        except IndexError:
+            try:
+                protoAtom = ProtoAtom.atomByID[atom+1]
+            except KeyError:
+                pass
+            else:
+                protoAtom.addDisplacement(coord, self, disp)
+        else:
+            protoAtom.addDisplacement(coord, self, disp)
+
+

@@ -456,6 +456,8 @@ class ATOM(AtomInterface):
         Adds the polarisation vectors for every internal vibration
         frequency to the atom.
         """
+        # print freq, disps
+        # raw_input()
         try:
             self.disps[str(freq)] = disps
         except:
