@@ -27,6 +27,7 @@ class MoleculeInterface(object):
 
     def add_atom(self, atom):
         self.atom_dict[atom.get_id()] = atom
+        self.atoms.append(atom)
 
     def set_cell(self, value):
         self.cell = value

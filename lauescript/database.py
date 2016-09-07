@@ -851,7 +851,7 @@ class Log_Buffer(list):
 
         # Add PseudoMolecules
         for i, pseudoMol in enumerate(ProtoAtom.pseudoMolecules):
-            name = 'pseudo{}'.format(i)
+            name = 'pointMass_{}'.format(i)
             self.data.give_daba_molecule(name , properties=[0, 0, 0, 0])
             self.data[name].give_atom(name=name+'atom',
                                          element='H',

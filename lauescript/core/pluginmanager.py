@@ -524,6 +524,7 @@ class PluginManager(object):
             return self.current_arg(key)
         value = False
         use = self.current_action
+
         if global_arg:
             use = 'global'
         if use in self.options.keys():
