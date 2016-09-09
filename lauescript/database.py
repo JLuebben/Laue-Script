@@ -6,13 +6,14 @@ Created on Nov 1, 2013
 Module containing functionality related to the creation of
 APD-database files.
 """
-from os import walk, listdir
 import os
+from os import walk, listdir
 
 import numpy as np
 
-from lauescript.invstring2 import get_invariom_names, get_invariom_names_simple
 from lauescript.cryst import crystgeom as cg
+from lauescript.core.core import apd_exit
+from lauescript.invstring2 import get_invariom_names, get_invariom_names_simple
 
 
 def daba_generator(data, frequency_cutoff):
@@ -52,7 +53,7 @@ def daba_generator(data, frequency_cutoff):
     # ===========================================================================
     # invlist2=[invlist[i] for i in xrange(len(invlist))\
     #                      if not datalist[i]==None]
-    #===========================================================================
+    # ===========================================================================
     pathlist2 = [pathlist[i] for i in xrange(len(pathlist)) \
                  if datalist[i] is not None]
     invmollist = []
@@ -75,7 +76,8 @@ def daba_generator(data, frequency_cutoff):
     dabacounter = 0
     for invmol in invmollist:
         dabacounter += 1
-        if dabacounter % 400 == 0: print '...'
+        if dabacounter % 400 == 0:
+            print '...'
         try:
             i = invmollist.index(invmol)
             data.add_molecule(str(vars()['invmol']), daba=True)
@@ -98,9 +100,9 @@ def daba_generator(data, frequency_cutoff):
         except:
             errorlog.write('\n!!!WARNING!!! Could not initialize ' + \
                            'classes.molecule instance for ' + invmol)
-    #===========================================================================
+    # ===========================================================================
     # count=0
-    #===========================================================================
+    # ===========================================================================
     print 'Starting calculations...'
     data.update(dabamode=True, errorlog=errorlog)
 
@@ -135,7 +137,7 @@ def daba_generator(data, frequency_cutoff):
 #                 data[invmol].atoms[-1].add_disps(freq[0],\
 #                              freq[4+num*3:7+num*3])
 #     data.update(dabamode=True,errorlog=errorlog)
-#===============================================================================
+# ===============================================================================
 
 
 
@@ -152,13 +154,13 @@ def read_frequency_block(filename, errorlog):
     block = []
     read_switch = False
     coord_switch = 0
-    #===========================================================================
+    # ===========================================================================
     # filename=filename.replace('home','user')
-    #===========================================================================
+    # ===========================================================================
     try:
-        #print filename
+        # print filename
         filepointer = open(filename)
-        #print 'a'
+        # print 'a'
     except:
         errorlog.write('\n!!!WARNING!!! File not found: ' + filename)
         return
@@ -182,8 +184,8 @@ def read_frequency_block(filename, errorlog):
 
         elif 'Harmonic frequencies (cm**-1)' in line and read_switch == True:
             blocklist.append(block)
-            #blocklist[1]=del_head(blocklist[1])
-            return blocklist  #,int(atomnumbers)
+            # blocklist[1]=del_head(blocklist[1])
+            return blocklist  # ,int(atomnumbers)
         elif ' Harmonic frequencies' in line and read_switch == False:
             blocklist.append(block)
             block = []
@@ -204,7 +206,7 @@ def read_frequency_block(filename, errorlog):
     filepointer.close()
 
     blocklist.append(block)
-    #blocklist[1]=del_head(blocklist[1])
+    # blocklist[1]=del_head(blocklist[1])
     return blocklist
 
 
@@ -213,15 +215,16 @@ def read_multiple_files(filelist, comlist, dabamode=False, errorlog=None):
     Reads multiple files from a list of files and returns the output from 'read_frequency_clock'
     for every file as a list.
     """
-    #===========================================================================
+    # ===========================================================================
     # totalatoms=0
-    #===========================================================================
+    # ===========================================================================
     datalist = []
     ##    print 'Reading database files...'
     count = 0
     for data in comlist:
         count += 1
-        if count % 50 == 0: print '...' + str(count) + ' files read...'
+        if count % 50 == 0:
+            print '...' + str(count) + ' files read...'
         if dabamode:
             name = data.split('/')[-4]
             data = data[:-11] + name + '.log'
@@ -246,14 +249,15 @@ def extract_single_freqencies_from_list(datalist, filelist, cutoff=-1):
     """
     alldata = {i: [] for i in filelist}
     print alldata
-    #===========================================================================
+    # ===========================================================================
     # counter=0
-    #===========================================================================
+    # ===========================================================================
     warninglist = []
     dabacounter = 0
     for j in xrange(len(datalist)):
         dabacounter += 1
-        if dabacounter % 400 == 0: print '...'
+        if dabacounter % 400 == 0:
+            print '...'
         freqcounter = 0
         try:
             for block in datalist[j][1:]:
@@ -278,7 +282,7 @@ def extract_single_freqencies_from_list(datalist, filelist, cutoff=-1):
             if cutoff > 0:
                 for freqlist in alldata[filelist[j]]:
                     if freqlist[0] <= cutoff:
-                        #alldata[filelist[j]].remove(freqlist)
+                        # alldata[filelist[j]].remove(freqlist)
                         freqlist[0] = 9999999
         except:
             warninglist.append(j)
@@ -327,7 +331,7 @@ def extract_single_freqency(data, compound_name, cutoff=0):
     if cutoff > 0:
         for freqlist in frequency_data:
             if freqlist[0] <= cutoff:
-                #frequency_data.remove(freqlist)
+                # frequency_data.remove(freqlist)
                 freqlist[0] = 9999999
     return frequency_data
 
@@ -336,9 +340,9 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                       path=None, apd_printer=None, root=None, frequency_scale=1,
                       newh=False):
     import lauescript.core.apd_printer as pr
-    #===========================================================================
+    # ===========================================================================
     # from config import DatabasePath
-    #===========================================================================
+    # ===========================================================================
     global printer
     if not apd_printer:
 
@@ -348,9 +352,9 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     errorlog = open('error.log', 'w')
     # if not root:
     #     root = '/Euros/NEUE_Datenbank/Modellverbindungen'
-    #===========================================================================
+    # ===========================================================================
     # root='/home/jens/generator_test'
-    #===========================================================================
+    # ===========================================================================
     log_mask = 'D95++3df3pd'
     log_mask = 'TZVP'
     # log_mask = 'def2TZVP'
@@ -360,9 +364,9 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     res = None
     mas = None
     fchk = None
-    #===========================================================================
+    # ===========================================================================
     # printer.headline('             APD-Toolkit Database Generator           ')
-    #===========================================================================
+    # ===========================================================================
     if not clean:
         printer('  Loading saved database state from database.pkl...')
         import cPickle
@@ -380,7 +384,7 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
         return
     printer('  Starting database generation...')
     printer('  Reading files from:\n  {}:\n'.format(root))
-    #===========================================================================
+    # ===========================================================================
     # progress=['|>       |',
     #           '|>>      |',
     #           '|>>>     |',
@@ -389,7 +393,7 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     #           '|>>>>>>  |',
     #           '|>>>>>>> |',
     #           '|>>>>>>>>|']
-    #===========================================================================
+    # ===========================================================================
     progress = ['[C o o o o o o o o o o o o o o o o o o o o o o o o o o o o ]',
                 '[ co o o o o o o o o o o o o o o o o o o o o o o o o o o o ]',
                 '[  C o o o o o o o o o o o o o o o o o o o o o o o o o o o ]',
@@ -448,18 +452,17 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                 '[                                                       co ]',
                 '[                                                        C ]',
                 '[                                                         c]',
-    ]
+                ]
     progress_counter = 0
 
     info_counter = 0
     dabaerror_log = open('DABAERROR.log', 'w')
     for (path, _, files) in walk(root):
 
-
-        #=======================================================================
+        # =======================================================================
         # if info_counter==100:
         #     break
-        #=======================================================================
+        # =======================================================================
 
         info_counter += 1
         if info_counter % 8 == 0:
@@ -470,10 +473,10 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
         if os.path.split(path)[0].endswith('Modellverbindungen'):
             res, mas, log, fchk = None, None, None, None
         if os.path.split(path)[1] == log_mask:
-            #===================================================================
+            # ===================================================================
             # If the log flag is still True, there was a parsing problem and the other
             # flags need to be reset.
-            #===================================================================
+            # ===================================================================
             if log:
                 res, mas, fchk = None, None, None
             logfiles = []
@@ -481,10 +484,10 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                 if filename.endswith('.log'):
                     logfiles.append(filename)
 
-            #===================================================================
+            # ===================================================================
             # If more than one log file is available, the newest one
             # is selected.
-            #===================================================================
+            # ===================================================================
             if len(logfiles) > 0:
                 newest_logfile = max([f for f in listdir(path) if f.endswith('.log')])
 
@@ -499,11 +502,11 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                     except IOError:
                         fchk = False
 
-        #=======================================================================
+        # =======================================================================
         # Reading the xd files associated with the log file.
         # If the log flag is None, their was a parsing error and the xd files
         # are skipped.
-        #=======================================================================
+        # =======================================================================
         elif path.endswith(xd_mask) and log and xd_mask2 in path:
             for filename in files:
                 if 'xd.res' == filename:
@@ -512,7 +515,6 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                 if 'xd.mas' == filename:
                     compound_name, cell = cg.read_xd_master_file(path + '/' + filename, dabaerror_log)
                     mas = True
-
 
         if res and mas and log and fchk:
             try:
@@ -546,17 +548,17 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
 
 
 
-    #data.release()
-    #===========================================================================
+    # data.release()
+    # ===========================================================================
     # import cPickle
     # f=open('APD_DABA.pkl','wb')
     # cPickle.dump(data,f)
     # f.close()
-    #===========================================================================
+    # ===========================================================================
 
-    #===========================================================================
+    # ===========================================================================
     # printer.bottomline('             Database generation completed            ')
-    #===========================================================================
+    # ===========================================================================
 
 
 def add_molecule(data,
@@ -573,34 +575,34 @@ def add_molecule(data,
     positions_list = []
     for atom_name in atom_names_list:
         positions_list.append(positions_dict[atom_name])
-    #===========================================================================
+    # ===========================================================================
     # invariom_dicts=[]
     # invariom_orientations=[]
-    #===========================================================================
+    # ===========================================================================
     first = True
     for names, orientations in get_invariom_names(atom_names_list,
                                                   frac=positions_list,
                                                   cell=cell,
                                                   dictionary=True,
                                                   orientations=True,
-                                                  #==========================================
+                                                  # ==========================================
                                                   # corrections_directory=path+'/',
-                                                  #==========================================
+                                                  # ==========================================
                                                   dynamic=True,
                                                   verbose=False,
                                                   output=printer,
                                                   newH=newh):
-        #if 'purin-6-amine' in compound_name:
+        # if 'purin-6-amine' in compound_name:
         #    print names['C(5)']
-        #=======================================================================
+        # =======================================================================
         # invariom_dicts.append(names)
         # invariom_orientations.append(orientations)
-        #=======================================================================
+        # =======================================================================
 
 
-        #===========================================================================
+        # ===========================================================================
         # invariom_dict=invariom_dict[0]
-        #===========================================================================
+        # ===========================================================================
         for atom_name in atom_names_list:
             if first:
 
@@ -627,6 +629,75 @@ def add_molecule(data,
         first = False
 
 
+class Reader(object):
+    """
+    Super awesome class for reading files that might contain references to other files when you don't want to deal
+    with that.
+
+    If file a.txt is:
+        1
+        2
+        3
+    and file b.txt is:
+        a
+        b
+        c
+    the code
+        with Reader('a.txt') as reader:
+            for line in reader.readlines():
+                    if '2' in line:
+                            reader.insert('b.txt')
+                    if 'b' in line:
+                            reader.remove()
+                    print line
+    will print
+        1
+        2
+        a
+        b
+        3
+    """
+
+    def __init__(self, fileName):
+        self.fileName = fileName
+        self.inserted = None
+        self.open = False
+
+    def readlines(self, ):
+        if not self.open:
+            self.fp = open(self.fileName, 'r')
+        while True:
+            n = None
+            if self.inserted:
+                n = self.inserted.readline()
+            if not n:
+                n = self.fp.readline()
+            if not n:
+                raise StopIteration
+            yield n
+
+    def __exit__(self, *args):
+        self.fp.close()
+        try:
+            self.inserted.close()
+        except:
+            pass
+
+    def __enter__(self):
+        self.fp = open(self.fileName, 'r')
+        return self
+
+    def insert(self, fileName):
+        self.inserted = open(fileName, 'r')
+
+    def remove(self):
+        self.inserted.close()
+        self.inserted = None
+
+    def fileInserted(self):
+        return True if self.inserted else False
+
+
 def generate_micro_database(data,
                             frequency_cutoff,
                             temperatures=None,
@@ -638,15 +709,24 @@ def generate_micro_database(data,
     if not printer:
         printer = pr.apd_printer(5, __name__)
     # printer.headline('          APD-Toolkit Micro-Database Generator        ')
-    filepointer = open(path)
+    filepointer = Reader(path)
     switch = False
     matrix_buffer = None
-    countSwitch = 0
-    counter = 0
+    # countSwitch = 0
+    # counter = 0
     readZMatrix = False
     ZMatrixCounter = 0
     readConstants = 0
     for line in filepointer.readlines():
+        if 'Z-Matrix taken from the checkpoint file' in line:
+            printer('No Z-Matrix in LOG file. Checking COM file...')
+            try:
+                filepointer.insert(path[:-3] + 'com')
+            except IOError:
+                apd_exit(1,'\n\nERROR: Cannot find corresponding COM file:\n   >>>{}<<<\nMake sure that the COM'
+                    ' file has the same base name as the LOG file'.format(path[:-3] + 'com'))
+            readZMatrix = True
+            continue
         # Identify core atoms and pseudo molecules in Z-matrix.
         if readZMatrix and 'Variables:' in line:
             readZMatrix = False
@@ -658,7 +738,8 @@ def generate_micro_database(data,
             params = sLine[2:-1]
             name = sLine[0]
             ProtoAtom(name, *params)
-        elif readZMatrix and line.startswith(' X--'):
+        elif readZMatrix and ' X--' in line:
+            print line
             ZMatrixCounter += 1
             sLine = line.strip().split()
             params = sLine[2:-1]
@@ -674,20 +755,21 @@ def generate_micro_database(data,
         elif readConstants > 0:
             ProtoAtom.resolveReferences(line)
 
-        if countSwitch > 0 and 'Variables:' in line:
-            countSwitch = -1
-        if countSwitch > 0 and line.rstrip().endswith('H'):
-            counter += 1
-        if countSwitch == 0 and 'VAL ONIOM calculation' in line:
-            countSwitch = 1
+        # if countSwitch > 0 and 'Variables:' in line:
+        #     countSwitch = -1
+        # if countSwitch > 0 and line.rstrip().endswith('H'):
+        #     counter += 1
+        # if countSwitch == 0 and 'VAL ONIOM calculation' in line:
+        #     countSwitch = 1
         if switch and 'Rotational constants' in line:
             switch = False
         elif switch:
             matrix_buffer.append(line.rstrip('\n'))
         elif 'Coordinates (Angstroms)' in line:
             switch = True
-            matrix_buffer = Log_Buffer(clustersize, data, path, frequency_cutoff, printer, frequency_scale, atoms=counter)
-    printer('Number of atoms: {}'.format(counter))
+            matrix_buffer = Log_Buffer(clustersize, data, path, frequency_cutoff, printer, frequency_scale,
+                                       atoms=ProtoAtom.numberOfCoreAtoms())
+    printer('Number of atoms: {}'.format(ProtoAtom.numberOfCoreAtoms()))
     matrix_buffer.flush()
     printer.bottomline('             Database generation completed            ')
     # for a in ProtoAtom.coreAtoms:
@@ -704,6 +786,7 @@ class ProtoAtom(object):
     pseudoMolecules = []
     atomByID = {}
     referenceTable = {}
+
     def __init__(self, name, xVar, yVar, zVar):
         self.name = name
         self.xVar = xVar
@@ -736,12 +819,11 @@ class ProtoAtom(object):
     def addDisplacement(self, coord, freq, disp):
         sfreq = '{}:{}'.format(freq.number, freq.freq)
         if int(coord) == 1:
-            self.disps[sfreq] = [freq.mass, float(disp),None, None]
+            self.disps[sfreq] = [freq.mass, float(disp), None, None]
         else:
             self.disps[sfreq][int(coord)] = float(disp)
-        # if int(coord) == 3:
-        #     print self, sfreq, self.disps[sfreq], self.ID
-
+            # if int(coord) == 3:
+            #     print self, sfreq, self.disps[sfreq], self.ID
 
     @staticmethod
     def numberOfCoreAtoms():
@@ -820,9 +902,7 @@ class Log_Buffer(list):
                                          molecule=self.data['micro'])
 
             self.data['micro'][atom_name].add_invariom(invariom_dict[atom_name],
-                                                        orientations[atom_name])
-
-
+                                                       orientations[atom_name])
 
             # for j, freq in enumerate(frequency_data[freq_num * -1:]):
             #     if len(freq) > 3:
@@ -844,7 +924,7 @@ class Log_Buffer(list):
                 if freq < self.frequency_cutoff:
                     continue
                 atom.add_disps(freq * self.frequency_scale, disps[1:])
-                if i==0:
+                if i == 0:
                     # if not freq > 99999:
                     # print freq * self.frequency_scale, disps[0]
                     self.data['micro'].freq.append([freq * self.frequency_scale, disps[0]])
@@ -852,11 +932,11 @@ class Log_Buffer(list):
         # Add PseudoMolecules
         for i, pseudoMol in enumerate(ProtoAtom.pseudoMolecules):
             name = 'pointMass_{}'.format(i)
-            self.data.give_daba_molecule(name , properties=[0, 0, 0, 0])
-            self.data[name].give_atom(name=name+'atom',
-                                         element='H',
-                                         cart=[pseudoMol.x, pseudoMol.y, pseudoMol.z],
-                                         molecule=self.data[name])
+            self.data.give_daba_molecule(name, properties=[0, 0, 0, 0])
+            self.data[name].give_atom(name=name + 'atom',
+                                      element='H',
+                                      cart=[pseudoMol.x, pseudoMol.y, pseudoMol.z],
+                                      molecule=self.data[name])
             atom = self.data[name].atoms[0]
             for freq, disps in pseudoMol.disps.items():
                 if disps[0] == 99999999:
@@ -870,7 +950,6 @@ class Log_Buffer(list):
                 # if not freq > 99999:
                 # print freq * self.frequency_scale, disps[0]
                 self.data[name].freq.append([freq * self.frequency_scale, disps[0]])
-
 
 
 class FrequencyReader(object):
@@ -902,7 +981,6 @@ class FrequencyReader(object):
                     else:
                         self.parseDisplacements(line)
 
-
     def bufferFrequencies(self, line):
         self.columnMap = {}
         line = [f for f in line.strip().split()[2:]]
@@ -910,14 +988,14 @@ class FrequencyReader(object):
             self.columnMap[i] = self.counter
             self.frequencies[self.counter] = Frequency(freq, self.counter)
             self.counter += 1
-        # print self.columnMap.items()
+            # print self.columnMap.items()
 
     def parseMasses(self, line):
         line = line.split('---')[1][1:-1]
         i = 0
         chunks = []
         while True:
-            chunk = line[i:i+10]
+            chunk = line[i:i + 10]
             i += 10
             if not chunk:
                 break
@@ -951,17 +1029,15 @@ class Frequency(object):
 
     def addDisplacement(self, atom, coord, disp):
         self.displacements.append(disp)
-        atom = int(atom) -1
+        atom = int(atom) - 1
         try:
             protoAtom = self.coreAtoms[atom]
         except IndexError:
             try:
-                protoAtom = ProtoAtom.atomByID[atom+1]
+                protoAtom = ProtoAtom.atomByID[atom + 1]
             except KeyError:
                 pass
             else:
                 protoAtom.addDisplacement(coord, self, disp)
         else:
             protoAtom.addDisplacement(coord, self, disp)
-
-
