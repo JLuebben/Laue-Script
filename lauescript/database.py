@@ -714,11 +714,12 @@ def generate_micro_database(data,
     matrix_buffer = None
     # countSwitch = 0
     # counter = 0
+    zMatrixFound = False
     readZMatrix = False
     ZMatrixCounter = 0
     readConstants = 0
     for line in filepointer.readlines():
-        if 'Z-Matrix taken from the checkpoint file' in line:
+        if not zMatrixFound and 'Z-Matrix taken from the checkpoint file' in line:
             printer('No Z-Matrix in LOG file. Checking COM file...')
             try:
                 filepointer.insert(path[:-3] + 'com')
@@ -731,6 +732,7 @@ def generate_micro_database(data,
         if readZMatrix and 'Variables:' in line:
             readZMatrix = False
         if 'Symbolic Z-matrix:' in line:
+            zMatrixFound = True
             readZMatrix = True
         elif readZMatrix and line.strip().endswith('H'):
             ZMatrixCounter += 1
@@ -738,8 +740,7 @@ def generate_micro_database(data,
             params = sLine[2:-1]
             name = sLine[0]
             ProtoAtom(name, *params)
-        elif readZMatrix and ' X--' in line:
-            print line
+        elif readZMatrix and 'X--' in line:
             ZMatrixCounter += 1
             sLine = line.strip().split()
             params = sLine[2:-1]
@@ -750,7 +751,7 @@ def generate_micro_database(data,
         # -------------
         if readConstants > 0 and 'GradGradGrad' in line:
             readConstants = -1
-        elif readConstants == 0 and 'Constants:' in line:
+        if readConstants == 0 and 'Constants:' in line:
             readConstants = 1
         elif readConstants > 0:
             ProtoAtom.resolveReferences(line)
@@ -834,7 +835,12 @@ class ProtoAtom(object):
         try:
             var, value = line.strip().split()
         except ValueError:
-            return
+            try:
+                var, value = line.strip().split('=')
+            except ValueError:
+                return
+            else:
+                var = var.strip()
         try:
             reference = ProtoAtom.referenceTable[var]
         except KeyError:
