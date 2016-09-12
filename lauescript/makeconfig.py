@@ -43,7 +43,7 @@ def run(outputName=None, data_path=None, plugin_path=None):
         data_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))[:-3] + 'data'
     if not plugin_path:
         plugin_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))[:-3] + 'examplePlugins'
-    report = True
+    report = False
     files = False
     if '-i' in argv:
         data_path, report, files = interactive()

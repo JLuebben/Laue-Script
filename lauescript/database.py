@@ -372,8 +372,11 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
         import cPickle
 
         if path:
-
-            picklepointer = open(path + '/database.pkl', 'r')
+            try:
+                picklepointer = open(path + '/database.pkl', 'r')
+            except IOError:
+                apd_exit(2, '\n\nERROR: Cannot find database file at\n  >>>{}<<<\n'
+                            'Please check if "~/.APDToolkit.ini" points to the correct location.'.format(path + '/database.pkl'))
         else:
             picklepointer = open('database.pkl', 'r')
         data = cPickle.load(picklepointer)
@@ -535,6 +538,7 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
 
     printer('  [----------------------All Files Read----------------------]')
     data.update(errorlog, printer)
+    return
     import lauescript.cryst.molgraph as mg
     graphs = []
     invdict = {}
