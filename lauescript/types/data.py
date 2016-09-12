@@ -158,7 +158,7 @@ class DATA(dict):
         cloud2 = self['micro'].coords()
         hitlist, transformation = match_point_clouds(cloud1, cloud2, threshold=.2)
         for i, atom in enumerate(self['exp'].atoms):
-            print atom.element, self['micro'].atoms[hitlist[i]].element,hitlist[i],self['micro'].atoms[hitlist[i]].name
+            # print atom.element, self['micro'].atoms[hitlist[i]].element,hitlist[i],self['micro'].atoms[hitlist[i]].name
             atom.transfer_matched_ADP(self['micro'].atoms[hitlist[i]], transformation)
 
     def _trust_molecules(self):
