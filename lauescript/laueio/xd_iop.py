@@ -11,6 +11,7 @@ from lauescript.cryst.transformations import frac2cart, \
     cart2frac_ADP
 from lauescript.laueio.io import IOP
 from lauescript.types.atom import AtomInterface
+from lauescript.core.core import apd_exit
 
 
 class KEY(dict):
@@ -118,7 +119,8 @@ class XDIOP(IOP):
 
     def parse(self):
         self.cell = None
-        self.master_file_name = self.filename.replace('.res', '.mas')
+        # self.master_file_name = self.filename.replace('.res', '.mas')
+        self.master_file_name = self.filename[:-3] + 'mas'
         self.parse_master_file()
         self.atoms = {}
         self.body = []
@@ -249,7 +251,10 @@ class XDIOP(IOP):
         keyswitch = False
         atomsswitch = False
         self.chemcons = {}
-        filepointer = open(self.master_file_name)
+        try:
+            filepointer = open(self.master_file_name)
+        except IOError:
+            apd_exit(3, '\n\nERROR: Cannot find file {}'.format(self.master_file_name))
         for line in filepointer.readlines():
             if line.lstrip(' ').startswith('!'):
                 continue
