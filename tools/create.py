@@ -68,7 +68,6 @@ if __name__ == '__main__':
     except ImportError:
         print 'ImportError: Main module not found. Please check if PYTHONPATH ist set up correctly.'
 
-    finally:
         print 'Trying to guess project path. Even if this works, please try to fix PYTHONPATH.'
         import sys
         import os
