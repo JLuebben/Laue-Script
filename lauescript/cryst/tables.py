@@ -11,8 +11,12 @@ class Table(object):
 
     def __getitem__(self, item):
         item = item.rstrip('-+')
+        item = item.rstrip('0123456789')
         item = item.capitalize()
-        return self.__class__.data[item]
+        try:
+            return self.__class__.data[item]
+        except KeyError:
+            raise KeyError('Unknown Element {}.'.format(item))
 
 class Atomtable(Table):
     data = {'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8,

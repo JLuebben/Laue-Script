@@ -164,8 +164,11 @@ class Loader(object):
         :return:
         """
         for headsize in [10, 100, 500]:
-            with open(filename) as fp:
-                head = fp.readlines(headsize)
+            try:
+                with open(filename) as fp:
+                    head = fp.readlines(headsize)
+            except IOError:
+                apd_exit(1, '\n\nERROR: Cannot find file >>>{}<<<'.format(filename))
             for tasteMehod in [method for method in dir(self) if method.startswith('_tastes_like_')]:
                 taste = getattr(self, tasteMehod)(head)
                 if taste:

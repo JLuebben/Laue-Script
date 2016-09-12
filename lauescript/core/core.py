@@ -58,6 +58,8 @@ def apd_exit(value=1, message=None, verbose=True):
                 message = ['Sending an error report to the developer failed.'] + [message]
 
     if verbose:
+        if not type(message) == list:
+            message = [message]
         printer(*message)
     config.exit(value)
 
