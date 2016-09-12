@@ -140,6 +140,8 @@ class XDIOP(IOP):
 
         for raw_line in self.content:
             line = raw_line[:-1].split()
+            if not line:
+                continue
             isAtomStart = True if '(' in line[0] else False
             isAtomRecord = True if atomFound and not counter > recordlength else False
             if atomFound and isAtomStart:
