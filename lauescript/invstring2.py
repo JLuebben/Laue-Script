@@ -59,7 +59,8 @@ def get_invariom_names(names,
                        output=None,
                        dynamic=False,
                        classic=True,
-                       newH=True):
+                       newH=True,
+                       planarityThreshold=.1):
     """
     Generator that returns the desired output once for every set
     of threshold values.
@@ -140,9 +141,9 @@ def get_invariom_names(names,
 
     generator = InvariomGenerator(thresholds)
     if cart:
-        generator.populate(names, cart, system='cart')
+        generator.populate(names, cart, system='cart', planarityThreshold=planarityThreshold)
     elif frac:
-        generator.populate(names, frac, system='frac', cell=cell)
+        generator.populate(names, frac, system='frac', cell=cell, planarityThreshold=planarityThreshold)
 
     if compounds:
         invariom_map = compounds.readlines()
@@ -225,7 +226,8 @@ def get_invariom_names_simple(names,
                               output=None,
                               dynamic=False,
                               classic=False,
-                              newH=True):
+                              newH=True,
+                              planarityThreshold=.1):
     """
     Generator that returns the desired output once for every set
     of threshold values.
@@ -305,9 +307,9 @@ def get_invariom_names_simple(names,
 
     generator = InvariomGenerator(thresholds)
     if cart:
-        generator.populate(names, cart, system='cart')
+        generator.populate(names, cart, system='cart', planarityThreshold=planarityThreshold)
     elif frac:
-        generator.populate(names, frac, system='frac', cell=cell)
+        generator.populate(names, frac, system='frac', cell=cell, planarityThreshold=planarityThreshold)
 
     if compounds:
         invariom_map = compounds.readlines()
@@ -471,7 +473,7 @@ class InvariomGenerator(object):
         #=======================================================================
         self.atoms[atom.get_name()] = atom
 
-    def populate(self, names, coordinates, system='cart', cell=None):
+    def populate(self, names, coordinates, system='cart', cell=None, planarityThreshold=.1):
         """
         Populates the generator instance with atoms and carries
         out all necessary computations.
@@ -502,7 +504,7 @@ class InvariomGenerator(object):
                 self.create_atom(name, coordinates[i], system, cell)
             self.generate_bonds()
             self.generate_angles()
-            self.find_rings()
+            self.find_rings(planarityThreshold)
             self.grow_enviroments()
             for name, atom in self.atoms.items():
                 if invfilter.correct(atom.enviroment):
@@ -551,7 +553,7 @@ class InvariomGenerator(object):
                 self.anglehashes.append(angle.hash)
                 atom.add_angle(angle)
 
-    def find_rings(self):
+    def find_rings(self, planarityThreshold):
         """
         Uses the RingFinder class to find rings in the molecule
         and communicates the obtained information to the
@@ -559,7 +561,7 @@ class InvariomGenerator(object):
         """
         # finder = RingFinder(self.angles, self.anglehashes)
         # rings = finder.harvest()
-        rings = find_planar_rings([self.atoms[name] for name in self.names], self.dist_result)
+        rings = find_planar_rings([self.atoms[name] for name in self.names], self.dist_result, planarityThreshold)
         for ring in rings:
             length = len(ring)
             IDs = []

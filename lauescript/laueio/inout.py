@@ -208,9 +208,7 @@ def read_experimental_coordinates(data):
         data['exp'].atoms[-1].give_frac(np.array(exppos[atom]))
 
 
-
-
-def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False):
+def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, planarityThreshold=.1):
     """
     A more flexible variation of the 'Load' function.
 
@@ -267,7 +265,8 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False):
                                                                          dynamic=True,
                                                                          output=printer,
                                                                          verbose=False,
-                                                                         newH=config.get_config_valueBool('APD', 'newH')):
+                                                                         newH=config.get_config_valueBool('APD', 'newH'),
+                                                                         planarityThreshold=planarityThreshold):
 
 
         invlist = [item for _, item in compounds.items()]

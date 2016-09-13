@@ -30,12 +30,12 @@ def find_rings(atoms, bonds=None):
     return ring_list
 
 
-def find_planar_rings(atoms, bonds=None):
+def find_planar_rings(atoms, bonds=None, planarityThreshold=.1):
     all_rings = find_rings(atoms, bonds=bonds)
-    return are_planar(atoms, all_rings)
+    return are_planar(atoms, all_rings, planarityThreshold)
 
 
-def are_planar(atoms, all_rings):
+def are_planar(atoms, all_rings, planarityThreshold=.1):
     atom_dict = {atom.get_name(): atom for atom in atoms}
     planar_rings = []
     for ring in all_rings:
@@ -51,7 +51,7 @@ def are_planar(atoms, all_rings):
             atom3 = atom_dict[atom_name3]
             v = abs(dot((atom0.cart - atom3.cart), cross((atom1.cart - atom3.cart), (atom2.cart - atom3.cart)))) / 6.
             planarity += v
-        if planarity / l < .1:
+        if planarity / l < planarityThreshold:
             planar_rings.append(ring)
     return planar_rings
 
