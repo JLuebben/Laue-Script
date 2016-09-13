@@ -53,7 +53,7 @@ def build_ls_matrices(data):
             A.append(np.array([adpX[4], 0, 0, 0, 0, 1, 0]))
             A.append(np.array([adpX[5], 0, 0, 0, 0, 0, 1]))
 
-            for i in xrange(len(adpN)):
+            for i in range(len(adpN)):
                 y.append(adpN[i])
 
     A = np.array(A)

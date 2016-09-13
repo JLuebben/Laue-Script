@@ -317,13 +317,13 @@ class ATOM(AtomInterface):
 
         code_list = []
 
-        for i in xrange(len(self.invariom_code) / 19):
+        for i in range(len(self.invariom_code) / 19):
             neighbor_code = self.invariom_code[i * 19:(i + 1) * 19]
 
             neighbor_code = neighbor_code[:12] + neighbor_code[13:]
             code_list.append(neighbor_code)
         unique_code_list = []
-        for i in xrange(2):
+        for i in range(2):
             for code in reversed(code_list):
                 if code_list.count(code) == 1:
                     full_code = code[:12] + '0' + code[12:]
@@ -472,18 +472,18 @@ class ATOM(AtomInterface):
         w, v = eig(adp)
 
         keep = w.tolist().index(min(w))
-        vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
+        vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in range(3)]
         # print(vectors)
 
         value = 0
-        for i in xrange(3):
+        for i in range(3):
             if not i == keep:
                 value += w[i]
         value *= 0.5
-        for i in xrange(3):
+        for i in range(3):
             if not i == keep:
                 w[i] = value
-        v = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
+        v = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in range(3)]
         # print vectors
         adp = matrix([[v[0][0], v[1][0], v[2][0]],
                       [v[0][1], v[1][1], v[2][1]],
@@ -494,7 +494,7 @@ class ATOM(AtomInterface):
         w, v = eig(adp)
 
         keep = w.tolist().index(min(w))
-        vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in xrange(3)]
+        vectors = [array((w[i] * v[:, i]).flatten().tolist()[0]) for i in range(3)]
         # print vectors
 
     def iter_bound_atoms(self):

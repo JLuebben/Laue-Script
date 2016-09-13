@@ -22,7 +22,7 @@ from lauescript.cryst.crystgeom import get_adp_as_matrix
 #     cart1 = np.array(cart1)
 #     cart2 = np.array(cart2)
 #     norm = np.linalg.norm(cart1 - cart2)
-#     return sum([(((0.5 * (2 * cart1[i] - 2 * (cart2[i] + 1)) / norm) ** 2) * err1[i]) * 2 for i in xrange(3)])
+#     return sum([(((0.5 * (2 * cart1[i] - 2 * (cart2[i] + 1)) / norm) ** 2) * err1[i]) * 2 for i in range(3)])
 
 
 def is_bound(pos1, el1, pos2, el2):
@@ -163,7 +163,7 @@ def rotate_ADP_about_axis(ADP, angle, axisDirection):
     """
     adp = get_adp_as_matrix(ADP)
     u, v = np.linalg.eig(adp)
-    startPoints = [v[:, i].flatten().tolist()[0] for i in xrange(3)]
+    startPoints = [v[:, i].flatten().tolist()[0] for i in range(3)]
     endPoints = [rotate_point_about_axis(point, angle, axisDirection, (0, 0, 0)) for point in startPoints]
     rotMat = get_transform(startPoints, endPoints, matrix=True).transpose()
     newadp = np.dot(rotMat.transpose(), np.dot(adp, rotMat))
@@ -189,7 +189,7 @@ def sparseDistance(atom1, atom2, radius=25, noAtoms = False):
         cart1 = atom1
         cart2 = atom2
     D = 0
-    for i in xrange(3):
+    for i in range(3):
         d = (cart1[i] - cart2[i])**2
         if d > radius:
             return None
@@ -258,7 +258,7 @@ class SpaceTree(object):
         :param neighbourRadius: Float type defining the desired search radius.
         """
         neighbourRadius *= 1.5
-        for i in xrange(100):
+        for i in range(100):
             j = 2**i
             spacings = [c/j for c in size]
             maxSpace = max(spacings)
@@ -271,7 +271,7 @@ class SpaceTree(object):
         :return: None
         """
         self.spacings = []
-        for level in xrange(self.depth):
+        for level in range(self.depth):
             levelSpacings = []
             refLevel = level + 1
             level = 2**level
@@ -279,11 +279,11 @@ class SpaceTree(object):
             for axis in self.size:
                 spacing = axis / (level+1)
                 levelSpacings.append(spacing)
-                axisData.append([gridValue*spacing for gridValue in xrange(1, level+1)])
+                axisData.append([gridValue*spacing for gridValue in range(1, level+1)])
             pointList = [((i, j, k), np.array([axisData[0][i], axisData[1][j], axisData[2][k]]))
-                         for i in xrange(level)
-                         for j in xrange(level)
-                         for k in xrange(level)]
+                         for i in range(level)
+                         for j in range(level)
+                         for k in range(level)]
             self.grid[refLevel] = {point[0]: point[1] for point in pointList}
             self.spacings.append(levelSpacings)
 
@@ -388,7 +388,7 @@ class Grid(dict):
         """
         signatureChunks = []
         nextLevelPoints = [(0, 0, 0)]
-        for level in xrange(1, self.levels+1):
+        for level in range(1, self.levels+1):
             radius = max(spacings[level-1])**2 + .5
             if radius < 9:
                 # if radius < 4.5:
@@ -462,12 +462,12 @@ import random
 #         np.array([1,1,0]),
 #         np.array([5,7,8]),]
 data = []
-for i in xrange(10):
+for i in range(10):
     # i *= 0.1
     data.append(np.array([i,i,i]))
 
 
-data = [np.array([random.randrange(0, 1000), random.randrange(0, 1000), random.randrange(0, 1000)]) for _ in xrange(10000)]
+data = [np.array([random.randrange(0, 1000), random.randrange(0, 1000), random.randrange(0, 1000)]) for _ in range(10000)]
 import datetime
 startFit = datetime.datetime.now()
 st.fitPoints(data)

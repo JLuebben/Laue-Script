@@ -137,7 +137,7 @@ class Analyser(object):
         Method for printing an overview to the cmd line.
         :return:
         """
-        print self.results
+        print(self.results)
 
 
 class Result(object):
@@ -148,7 +148,7 @@ class Result(object):
     def __init__(self, bondvector, relativemass, evalues, evectors):
         self.results = []
         self.value = None
-        for i in xrange(3):
+        for i in range(3):
             vector = evectors[:, i]
             evalue = evalues[i]
             cangle = abs(dot(bondvector, vector).flatten().tolist()[0][0])

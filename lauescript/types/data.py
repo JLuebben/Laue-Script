@@ -1,3 +1,4 @@
+from __future__ import print_function
 """
 Created on Nov 1, 2013
 
@@ -8,8 +9,8 @@ data structure of the APD-Toolkit. These classes serve as containers
 for molecules and atoms and provide the interface for manipulating
 most of their properties.
 """
-import operator
 
+import operator
 from lauescript.types.molecule import MOLECULE, DABA_MOLECULE
 from lauescript.cryst.match import match_point_clouds, get_transform
 from lauescript.cryst.geom import is_bound
@@ -100,7 +101,7 @@ class DATA(dict):
         :param name: String representing the molecule name.
         :param cell: List with six floats: [a, b, c, alpha, beta, gamma]
         """
-        print 'DATA.add_molecule is deprecated. Please use DATA.give_molecule'
+        print('DATA.add_molecule is deprecated. Please use DATA.give_molecule')
         self[name] = MOLECULE(name=name, cell=cell)
 
     def give_daba_molecule(self, name, cell=None, properties=None):
@@ -379,7 +380,10 @@ class GENERATOR(DATA):
         self.release()
 
         # self.strip()
-        import cPickle
+        try:
+            import cPickle
+        except ImportError:
+            import pickle as cPickle
 
         f = open('database.pkl', 'wb')
         cPickle.dump(self, f)
@@ -481,7 +485,7 @@ class GENERATOR(DATA):
             pstate = daba_counter / max_counter
             pstate = int(58 * pstate)
             bar = '[' + pstate * '#' + (58 - pstate) * '-' + ']'
-            print '      |  {}\r'.format(bar),
+            print('      |  {}'.format(bar), end='\r')
             stdout.flush()
 
             try:
@@ -549,7 +553,7 @@ class GENERATOR(DATA):
             job_q.put(molecule)
         jobs = []
         message_q = multiprocessing.Queue()
-        for i in xrange(n):
+        for i in range(n):
             p = Worker(self, Temp, message_q, job_q, i)
             jobs.append(p)
             p.start()

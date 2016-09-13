@@ -2,7 +2,6 @@ __author__ = 'jens'
 
 from networkx import cycle_basis, Graph
 from numpy import dot, cross
-
 from lauescript.cryst.geom import is_bound
 from lauescript.cryst.iterators import iter_atom_pairs
 

@@ -77,9 +77,9 @@ def _set_filter(config, arg1, arg2):
     return isofilter, isopartnerfilter
     isofilterlist = []
     isopartnerfilterlist = []
-    for i in xrange(len(isofilter) / 2):
+    for i in range(len(isofilter) / 2):
         isofilterlist.append(tuple(isofilter[2 * i:2 * i + 2]))
-    for i in xrange(len(isopartnerfilter) / 2):
+    for i in range(len(isopartnerfilter) / 2):
         isopartnerfilterlist.append(tuple(isopartnerfilter[2 * i:2 * i + 2]))
 
     return [isofilterlist, isopartnerfilterlist]

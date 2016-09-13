@@ -457,7 +457,7 @@ class DABA_MOLECULE(MOLECULE):
         The ADP in 'adp_list' must be in the same order as the atoms in
         self.atoms.
         """
-        for i in xrange(len(self.atoms)):
+        for i in range(len(self.atoms)):
             self.atoms[i].adp[use] = adp_list[i]
 
     def strip_molecule(self, keep):
@@ -511,24 +511,24 @@ class DABA_MOLECULE(MOLECULE):
         deltalist = []
         freqmat = zeros((len(self.freq), len(self.atoms) * 3))
         freqmat2 = zeros((len(self.freq), len(self.atoms) * 3))
-        for k in xrange(len(self.freq)):
+        for k in range(len(self.freq)):
             freq0 = self.freq[k]
             m_red = freq0[1]
             delta = (1 / (tanh(hk * freq0[0] / Temp))) * hc / freq0[0] / m_red
             deltalist.append(delta)
             atomcount = 0
             for atom in self.atoms:
-                for i in xrange(3):
+                for i in range(3):
                     freqmat[k][atomcount + i] = atom.disps[str(freq0[0])][i]
                     freqmat2[k][atomcount + i] = atom.disps[str(freq0[0])][i] * deltalist[k]
                 atomcount += 3
 
         Umat = zeros((len(self.atoms) * 3, len(self.atoms) * 3))
-        for i in xrange(len(self.atoms) * 3):
-            for j in xrange(len(self.atoms) * 3):
-                for k in xrange(len(self.freq)):
+        for i in range(len(self.atoms) * 3):
+            for j in range(len(self.atoms) * 3):
+                for k in range(len(self.freq)):
                     Umat[i, j] += freqmat[k, i] * freqmat2[k, j]
-        for i in xrange(len(self.atoms)):
+        for i in range(len(self.atoms)):
             j = 3 * i
             atom = self.atoms[i]
             adp = []

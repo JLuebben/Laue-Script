@@ -39,4 +39,4 @@ def run(pluginManager):
 def rand_coord(size=100000):
     return [array([random.randrange(0,2000,step = 1)*0.1,
              random.randrange(0,2000,step = 1)*0.1,
-             random.randrange(0,2000,step = 1)*0.1]) for _ in xrange(size)]
+             random.randrange(0,2000,step = 1)*0.1]) for _ in range(size)]

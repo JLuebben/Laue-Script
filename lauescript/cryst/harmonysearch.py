@@ -130,7 +130,7 @@ class Memory(object):
         Harmony objects.
         """
         self.generator = generator
-        self.memory = [generator.createRandomHarmony() for _ in xrange(self.size)]
+        self.memory = [generator.createRandomHarmony() for _ in range(self.size)]
         self._introspect()
 
     def _introspect(self):
@@ -426,7 +426,7 @@ def harmonize(bounds,
     memory = Memory(memorySize, convergenceRate, dynamicPitch)
     memory.populate(gen)
     converged = False
-    for _ in xrange(iterations):
+    for _ in range(iterations):
         try:
             memory += gen.createHarmony(memory)
         except ConvergenceReached:
@@ -508,12 +508,12 @@ def harmonize_par(bounds,
     job_q = multiprocessing.Queue()
     n = 4
     i = 0
-    for i in xrange(iterations):
+    for i in range(iterations):
         job_q.put(i)
     jobs = []
     message_q = multiprocessing.Queue()
     update_qs = []
-    for i in xrange(n):
+    for i in range(n):
         update_qs.append(multiprocessing.Queue())
         p = Worker(deepcopy(memory), deepcopy(gen), message_q, job_q, i, update_qs[-1])
         jobs.append(p)

@@ -293,7 +293,6 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, pl
             if len(neighbours) > 1:
                 for atom2 in neighbours:
                     if not atom2.get_active_invariom():
-                        print '2'
                         message = 'Error: The following invarioms are missing in the database:\n'
                         message += '\n'.join(['{:<6} <-> {:>}'.format(miss[0].name, miss[1]) for miss in misses])
                         message += '\n\n!!!Terminating program due to fatal error: MISSING INVARIOMS!!!'
@@ -301,7 +300,6 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, pl
                 atom.tolerate()
                 printer('WARNING: Tolerating missing invariom for {}.'.format(atom.name))
             else:
-                print '1'
                 message = 'Error: The following invarioms are missing in the database:\n'
                 message += '\n'.join(['{:<6} <-> {:>}'.format(miss[0].name, miss[1]) for miss in misses])
                 message += '\n\n!!!Terminating program due to fatal error: MISSING INVARIOMS!!!'
@@ -351,7 +349,7 @@ class CIF(dict):
             self.parse()
             self.convert()
         except:
-            print 'inout.py: Error: Could not parse CIF.'
+            print('inout.py: Error: Could not parse CIF.')
 
 
     #===========================================================================
@@ -384,7 +382,7 @@ class CIF(dict):
         atomdict = {}
         fullatomdict = {}
 
-        for i in xrange(len(self['_atom_site_label'])):
+        for i in range(len(self['_atom_site_label'])):
             name = self['_atom_site_label'][i]
             if 'DUM' in name:
                 continue
@@ -400,7 +398,7 @@ class CIF(dict):
                 atomdict[self['_atom_site_label'][i]] \
                     ['element'] = cg.xd_element(self['_atom_site_label'][i])
 
-        for i in xrange(len(self['_atom_site_aniso_label'])):
+        for i in range(len(self['_atom_site_aniso_label'])):
             name = self['_atom_site_aniso_label'][i]
             if 'DUM' in name:
                 continue
@@ -441,7 +439,7 @@ class CIF(dict):
             linecontent += line.replace('\n', ' ')
         wordcontent = [i for i in linecontent.split(' ') if len(i) > 0]
         read = False
-        for i in xrange(len(wordcontent)):
+        for i in range(len(wordcontent)):
             word = wordcontent[i]
             if word.startswith('data_'):
                 self.data = word[5:]
@@ -526,10 +524,10 @@ class CIF(dict):
                     joined += ' ' + element
                 elif not join:
                     cleanbody.append(element)
-        content = [[columns[i]] for i in xrange(linelen)]
-        for i in xrange(len(cleanbody) / linelen):
+        content = [[columns[i]] for i in range(linelen)]
+        for i in range(len(cleanbody) / linelen):
             line = cleanbody[linelen * i:linelen * (i + 1)]
-            for j in xrange(linelen):
+            for j in range(linelen):
                 content[j].append(line[j])
         for line in content:
             self[line[0]] = line[1:]
@@ -542,7 +540,7 @@ class CIF(dict):
         length = max([len(i) for i in columns])
         widths = [0] * len(columns)
         types = [True] * len(columns)
-        for i in xrange(length - 1):
+        for i in range(length - 1):
             i += 1
             for j, col in enumerate(columns):
                 try:
@@ -557,7 +555,7 @@ class CIF(dict):
                         widths[j] = len(col[i])
                 except:
                     pass
-        for i in xrange(length):
+        for i in range(length):
             for j, col in enumerate(columns):
                 try:
                     if types[j] and not col[i].endswith(')'):
@@ -683,7 +681,7 @@ class CIF(dict):
             search_columns = (0, len(row_keys))
         for table in self.tables:
             if column in table:
-                for i in xrange(len(self[column])):
+                for i in range(len(self[column])):
                     checks = []
 
                     for c in table[search_columns[0]:search_columns[1]]:
@@ -722,7 +720,7 @@ def value(string):
     """
     if not '(' in string:
         return float(string)
-    for i in xrange(len(string)):
+    for i in range(len(string)):
         if string[i] == '(':
             break
     try:
@@ -739,7 +737,7 @@ def error(string):
     returns 'None'.
     """
     newstring = ''
-    for i in xrange(len(string)):
+    for i in range(len(string)):
         if string[i] == '(':
             break
         elif string[i] == '.':

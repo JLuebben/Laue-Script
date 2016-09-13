@@ -72,7 +72,7 @@ def set_threshold(hirshfeld_list, matrix):
     #     #     printer( line)
     #     #===========================================================================
     #
-    #     norid_values=[j[i] for j in matrix for i in xrange(len(matrix[0])) if  j[i] > 1]
+    #     norid_values=[j[i] for j in matrix for i in range(len(matrix[0])) if  j[i] > 1]
     #     norid_values.remove(max(norid_values))
     #     norid_values.remove(min(norid_values))
     #
@@ -166,7 +166,7 @@ def generate_rigid_groups(axislist, matrix):
         vals.append(check_rigidity(group, matrix))
     accepted_groups = []
     printer('\n')
-    for _ in xrange(len(vals)):
+    for _ in range(len(vals)):
         bestgroup = min(vals)
         if bestgroup > RIGIDITY_THRESHOLD:
             if len(accepted_groups) == 0:

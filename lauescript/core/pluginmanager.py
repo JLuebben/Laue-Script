@@ -5,6 +5,7 @@ Created on Jan 22, 2014
 
 Class implementing the plugin manager.
 """
+from __future__ import print_function
 import imp
 from sys import argv
 from os import listdir
@@ -348,6 +349,8 @@ class PluginManager(object):
         if unmute:
             self.mute()
 
+    # def parse_argv
+
     def parse_argv(self, argv):
         """
         Parses the commandline string and assigns the specified
@@ -521,7 +524,7 @@ class PluginManager(object):
         is found in both, the module specific one is returned.
         """
         if self.current_option:
-            return self.current_arg(key)
+            return self.current_arg(key) if not type(self.current_arg(key)) is ARG else str(self.current_arg(key))
         value = False
         use = self.current_action
 
@@ -543,8 +546,7 @@ class PluginManager(object):
                     value = None
                     print('Warning: OPTION_ARGUMENTS in module {} should be a dictionary type.'\
                         .format(self.plugins[self.current_action].__file__))
-
-        return value
+        return value if type(value) is not ARG else str(value)
 
     def current_arg(self, key):
         """
@@ -600,19 +602,24 @@ class PluginManager(object):
         sys.argv = self.argv
 
 
-class ARG(str):
+class ARG(object):
     """
     Class representing a command line argument
     """
 
     def __init__(self, value):
-        super(ARG, self).__init__(value)
-        self.list = self.split(':')
+        self.str = value
+        self.list = value.split(':')
+
+    def __str__(self):
+        return self.str
 
     def __getitem__(self, i):
         try:
             return self.list[i]
         except:
             raise IndexError
+
+
 
 

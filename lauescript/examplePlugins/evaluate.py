@@ -132,13 +132,13 @@ def c1(adp1, adp2):
                          [float(adp[4]), float(adp[5]), float(adp[2])]])
         w, v = np.linalg.eig(adp)
         return [np.array((w[j] * v[:, j]).flatten().tolist()[0]) for j \
-                in xrange(3)]
+                in range(3)]
 
     adp1_axis = get_axis(adp1)
     adp2_axis = get_axis(adp2)
 
     val = 0
-    for i in xrange(3):
+    for i in range(3):
         addval = abs(norm(adp1_axis[i] - adp2_axis[i]))
         addval = addval * abs((1 - abs(np.dot(adp1_axis[i], adp2_axis[i]))))
         val += addval
@@ -267,9 +267,9 @@ def set_filter():
     return isofilter, isopartnerfilter
     isofilterlist = []
     isopartnerfilterlist = []
-    for i in xrange(len(isofilter) / 2):
+    for i in range(len(isofilter) / 2):
         isofilterlist.append(tuple(isofilter[2 * i:2 * i + 2]))
-    for i in xrange(len(isopartnerfilter) / 2):
+    for i in range(len(isopartnerfilter) / 2):
         isopartnerfilterlist.append(tuple(isopartnerfilter[2 * i:2 * i + 2]))
 
     return [isofilterlist, isopartnerfilterlist]

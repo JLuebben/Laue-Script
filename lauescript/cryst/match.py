@@ -17,7 +17,7 @@ import numpy as np
 
 bestFit = None
 
-def match_point_clouds(cloud1, cloud2, threshold=1, maxiter=None):
+def match_point_clouds(cloud1, cloud2, threshold=1, maxiter=0):
     """
     Matches two point clouds.
     'cloud1' and 'cloud2' are lists of numpy.arrays.
@@ -345,7 +345,7 @@ def test():
         no = 0
         wrong = 0
         tries = 500
-        for _ in xrange(tries):
+        for _ in range(tries):
             sample_cloud = [random_coord(),
                             random_coord(),
                             random_coord(),
