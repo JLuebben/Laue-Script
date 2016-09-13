@@ -417,7 +417,7 @@ class PluginManager(object):
                 self.plugins[self.plugins[plugin].KEY] = self.plugins[plugin]
                 if not self.plugins[plugin].KEY == plugin:
                     renamelist.append(plugin)
-            except KeyError:
+            except AttributeError:
                 self.printer('No KEY found in module {}. Ignoring module.'.format(plugin))
         for plugin in renamelist:
             del self.plugins[plugin]
@@ -455,7 +455,15 @@ class PluginManager(object):
         self.current_option = None
         self.current_action = action
         if options:
-            self.current_option = options
+            try:
+                self.current_option = self.plugins[action].OPTION_ARGUMENTS
+            except AttributeError:
+                self.current_option = options
+            else:
+                self.current_option.update(options)
+        # if self.current_option:
+        #     for key,value in self.current_option.items():
+        #         print(key,value)
         action = action.rstrip('_')
         self.moduledepth += 5
         self.printer_list.append(apd_printer(self.moduledepth, self.plugins[action].__name__))
@@ -469,8 +477,14 @@ class PluginManager(object):
         self.moduledepth -= 5
         self.delta(self)
         self.callStack.pop(-1)
+        self.current_option = None
 
     def arg(self, key):
+        if self.current_option:
+            try:
+                return self.current_option[key]
+            except KeyError:
+                return False
         currentAction = self.callStack[-1]
         options = self.options[currentAction]
         try:
