@@ -51,14 +51,14 @@ class XDAtom(AtomInterface):
         super(XDAtom, self).set_frac(value)
 
     def set_adp_cart(self, value):
-        if not None == value:
+        if not None is value:
             self.adp_frac = cart2frac_ADP(value, self.cell)
 
     def get_adp_cart(self):
         return frac2cart_ADP(self.adp_frac, self.cell)
 
     def set_cart(self, value):
-        if not None == value:
+        if not None is value:
             self.frac = cart2frac(value, self.cell)
 
     def get_cart(self):

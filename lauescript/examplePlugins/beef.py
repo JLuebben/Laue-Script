@@ -83,7 +83,7 @@ def run(pluginManager):
         for element, values in details(data).items():
             printer('{:>3}: {:5.3f}'.format(element, mean(values)))
     if pluginManager.arg('write'):
-        options = {'options': ['full'], 'use': ['beef']}
+        options = {'full': True, 'use': 'beef'}
         pluginManager.call('W', options)
 
 def details(data):
@@ -238,7 +238,7 @@ class Result(object):
     def __init__(self, bondvector, evalues, evectors):
         self.results = []
         self.value = None
-        for i in xrange(3):
+        for i in range(3):
             vector = evectors[:, i]
             evalue = evalues[i]
             cangle = abs(dot(bondvector, vector).flatten().tolist()[0][0])
@@ -275,7 +275,7 @@ class Result(object):
 def find_f(data):
     pairs = build_list(data)
     l = []
-    for f in xrange(1, 300, 2):
+    for f in range(1, 300, 2):
         f = float(f)/300.
         c = check_f(pairs, f)
         l.append((c, f))

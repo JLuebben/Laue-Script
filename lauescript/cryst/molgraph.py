@@ -617,8 +617,8 @@ def test():
     gg.addEdge(ee2)
     gg.addEdge(ee3)
 
-    print g
-    print gg
+    print(g)
+    print(gg)
     print(g-gg)
 
 

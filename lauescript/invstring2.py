@@ -1,3 +1,4 @@
+from __future__ import print_function
 """
 Created on 01.04.2014
 
@@ -15,6 +16,7 @@ from sys import stdout
 from string import ascii_letters
 from lauescript.cryst.rings import find_planar_rings
 from sklearn.neighbors import NearestNeighbors
+
 
 covalence_radius = {'H': .37, 'He': .0, 'Li': 1.23, 'Be': .90, 'B': .80, 'C': .77,
                     'N': .74, 'O': .71, 'F': .72, 'Ne': 0., 'Na': 1.54, 'Mg': 1.36,
@@ -149,7 +151,7 @@ def get_invariom_names(names,
         invariom_map = compounds.readlines()
 
     returnlists = []
-    for l in xrange(len(thresholds)):
+    for l in range(len(thresholds)):
         returnlist = []
         name_dictionary = {}
         orientation_dictionary = {}
@@ -174,7 +176,7 @@ def get_invariom_names(names,
 
 def newAge(invariomName, atom, generator, i):
     # try:
-        heavyAtom = atom.get_bonds().values()[0].get_partner(atom)
+        heavyAtom = list(atom.get_bonds().values())[0].get_partner(atom)
         return '&'.join([invariomName, generator.get_invariom_name_of(heavyAtom.get_name(), i)])
     # except IndexError:
     #     return invariomName
@@ -315,7 +317,7 @@ def get_invariom_names_simple(names,
         invariom_map = compounds.readlines()
 
     returnlists = []
-    for l in xrange(len(thresholds)):
+    for l in range(len(thresholds)):
         returnlist = []
         name_dictionary = {}
         orientation_dictionary = {}
@@ -489,7 +491,7 @@ class InvariomGenerator(object):
         """
         self.names = names
         if system == 'frac' and not cell:
-            print 'invsting2.py: Error. Cell missing.'
+            print('invsting2.py: Error. Cell missing.')
             exit()
 
         samples = coordinates
@@ -497,7 +499,7 @@ class InvariomGenerator(object):
         self.neigh.fit(samples)
         self.dist_result = self.neigh.kneighbors(samples, len(samples), return_distance=False)
 
-        for _ in xrange(len(self.thresholds)):
+        for _ in range(len(self.thresholds)):
             self.next()
             self.atoms = {}
             for i, name in enumerate(names):
@@ -806,7 +808,7 @@ class Atom(object):
                 break
             element.append(char)
         element = ''.join(element).capitalize()
-        for _ in xrange(10):
+        for _ in range(10):
             if not element in electron_number.keys():
                 element = element[:-1]
             else:
@@ -842,7 +844,7 @@ class Atom(object):
         #             break
         #         element.append(char)
         #     element = ''.join(element).capitalize()
-        #     for _ in xrange(10):
+        #     for _ in range(10):
         #         if not element in electron_number.keys():
         #             element = element[:-1]
         #         else:
@@ -1378,7 +1380,7 @@ class Enviroment(object):
         priorities = chain.branch_priorities.values()
         unique_atoms = []
         for i, priority in enumerate(priorities):
-            if priorities.count(priority) == 1:
+            if list(priorities).count(priority) == 1:
                 unique_atoms.append(i)
         if len(unique_atoms) > 0:
             self.o_atom_2 = chain_atoms[unique_atoms[0]]
@@ -1713,7 +1715,7 @@ def test():
     #===========================================================================
     for i in get_invariom_names(frac=coords, cell=cell, names=names, orientations=True,
                                 corrections=open('../data/empirical_corrections.txt'), dynamic=True):
-        print i
+        print(i)
 
 
 if __name__ == '__main__':

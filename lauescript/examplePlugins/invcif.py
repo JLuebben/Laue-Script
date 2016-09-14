@@ -233,7 +233,7 @@ def del_angles(cif):
     Removes angles defined by positions of hydrogens atoms.
     """
     removelist = []
-    for i in xrange(3):
+    for i in range(3):
         for j, label in enumerate(cif['_geom_angle_atom_site_label_{}'.format(i + 1)]):
             if label.startswith('H('):
                 if not j in removelist:

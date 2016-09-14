@@ -271,7 +271,7 @@ if __name__ == '__main__':
     no = 0
     wrong = 0
     tries = 1
-    for _ in xrange(tries):
+    for _ in range(tries):
         sample_cloud = [random_coord(),
                         random_coord(),
                         random_coord(),

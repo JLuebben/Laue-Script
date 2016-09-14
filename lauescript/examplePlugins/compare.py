@@ -55,7 +55,7 @@ def run(pluginManager):
             relSize = '='
         else:
             relSize = '-'
-        relSizeComp = ''.join(['+' if (atom.adp[use[0]][i]-atom2.adp[use[1]][i]) > 0 else '-' for i in xrange(3)])
+        relSizeComp = ''.join(['+' if (atom.adp[use[0]][i]-atom2.adp[use[1]][i]) > 0 else '-' for i in range(3)])
         printer('{:7s}{:10f}      {}({})'.format(atom.name, vals[-1], relSize, relSizeComp))
         if atom.element == 'H':
             hlist.append(vals[-1])

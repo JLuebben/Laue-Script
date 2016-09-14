@@ -132,16 +132,16 @@ def center_molecule(atom_coords):
 def get_pair_list(atom_elements_1, atom_coords_1,
                   atom_elements_2, atom_coords_2):
     pair_list = []
-    for i in xrange(len(atom_coords_1)):
+    for i in range(len(atom_coords_1)):
         best_hit = (9, None)
-        for j in xrange(len(atom_coords_2)):
+        for j in range(len(atom_coords_2)):
             dist = np.linalg.norm(atom_coords_1[i] - atom_coords_2[j])
             if dist < best_hit[0] and atom_elements_1[i] == atom_elements_2[j]:
                 best_hit = (dist, j)
         pair_list.append(best_hit[1])
     # ===========================================================================
     # print
-    # for i in xrange(len(pair_list)):
+    # for i in range(len(pair_list)):
     #     print atom_atoms_1[i],atom_atoms_2[pair_list[i]]
     #===========================================================================
     return pair_list
@@ -348,7 +348,7 @@ def eigenv2tensor(axis):
     """
     vec = np.ones((3, 3))
     vecval = np.ones((3, 3))
-    for i in xrange(len(axis)):
+    for i in range(len(axis)):
         vmag = np.linalg.norm(axis[i])
         v = axis[i] / vmag
         #print v
@@ -405,9 +405,9 @@ def get_adp_from_calc(vx, vy, vz):
 #     This function is used by the get_best_point() function.
 #     """
 #     maindict={}
-#     for i in xrange(len(atomlist1)):
+#     for i in range(len(atomlist1)):
 #         distdict={}
-#         for j in xrange(len(atomlist2)):
+#         for j in range(len(atomlist2)):
 #             if not atomlist2[j][0] in distdict.keys():
 #                 distdict[atomlist2[j][0]]=[[np.linalg.norm(coordlist1[i]-coordlist2[j]),atomlist2[j]]]
 #             else:
@@ -433,7 +433,7 @@ def get_best_quaternion(coordlist1, coordlist2):
         number = len(coordlist1)
     else:
         number = len(coordlist2)
-    for i in xrange(number):
+    for i in range(number):
         aaa = np.matrix(np.outer(coordlist1[i], coordlist2[i]))
         M = M + aaa
 
@@ -587,7 +587,7 @@ def rotate_list_by(coordlist, R):
     Returns a list of coordinates where every position is rotated by
     the the rotation matrix 'R'.
     """
-    for coord in xrange(len(coordlist)):
+    for coord in range(len(coordlist)):
         value = np.dot(R, coordlist[coord])
         value = np.array(value).reshape(-1, ).tolist()
         coordlist[coord] = value
@@ -723,7 +723,7 @@ def link_atoms_by_distance(distlist1, atomlist1, distlist2, atomlist2, keys):
                 partnervalue = 0
                 keylist = partner.keys()
                 for key in keylist:
-                    for element in xrange(len(atom[key])):
+                    for element in range(len(atom[key])):
                         partnervalue += abs(atom[key][element] - partner[key][element])
             else:
                 partnervalue = 9999999
@@ -797,7 +797,7 @@ def link_atoms_by_distance_diff(distlist1, atomlist1, distlist2, atomlist2, keys
                 partnervalue = 0
                 keylist = partner.keys()
                 for key in keylist:
-                    for element in xrange(len(atom[key])):
+                    for element in range(len(atom[key])):
                         value = abs(atom[key][element] - partner[key][element])
                         partnervalue += value
             else:
@@ -847,7 +847,7 @@ def read_multiple_coordinates(fragmentnames):
 ##            keylist.append(key)
 ##            positions[key]=coords
 ##    sortkeylist=[]
-##    for i in xrange(len(keylist)):
+##    for i in range(len(keylist)):
 ##        j=i+1
 ##        for key in keylist:
 ##            if j==int(key[2:-1]):
@@ -887,7 +887,7 @@ def read_xd_parameter_file(path, sort=False):
             positions[key] = coords
     if sort:
         sortkeylist = []
-        for i in xrange(len(keylist)):
+        for i in range(len(keylist)):
             j = i + 1
             for key in keylist:
                 number = get_number(key)
@@ -923,7 +923,7 @@ def read_coordinates(path='', sort=True):
             positions[key] = coords
     if sort:
         sortkeylist = []
-        for i in xrange(len(keylist)):
+        for i in range(len(keylist)):
             j = i + 1
             for key in keylist:
                 number = get_number(key)
@@ -998,7 +998,7 @@ def list_to_dict(atomlist, full=False):
 #     """
 #     linklist=[]
 #     keylist=xatomdict.keys()
-#     for atom in xrange(len(gatomlist)):
+#     for atom in range(len(gatomlist)):
 #         for key in keylist:
 #             if int(key)==atom+1:
 #                 linklistline=[atomlist[atom][1],xatomdict[key]]

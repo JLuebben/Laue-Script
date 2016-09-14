@@ -21,7 +21,7 @@ def raw_rotation_matrix(data, axis, rigid_group):
     Determines an 'empty' rotation matrix suitable for fitting the
     rotation angle by a least squares method.
     """
-    print '\n\n\n\n Am I really used???????????\n\n\n\n'
+    print('\n\n\n\n Am I really used???????????\n\n\n\n')
     axis /= np.linalg.norm(axis)
     a, b, c = axis[0], axis[1], axis[2]
     raw_matrix = []
@@ -79,13 +79,13 @@ def prep_data2ls(data, useH=False):
                 adplist_int = atom.adp['cart_int']
                 adplist = []
                 if not atom.adp['cart_meas'] is None:
-                    for m in xrange(len(adplist_sum)):
+                    for m in range(len(adplist_sum)):
                         if uncorrelate:
                             adplist.append(adplist_sum[m] - adplist_int[m])
                         else:
                             adplist.append(adplist_sum[m])
 
-                    for i in xrange(len(adplist)):
+                    for i in range(len(adplist)):
                         y.append(adplist[i])
     A = np.array(A)
     return A, y
@@ -119,15 +119,15 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
                 x3 = (xlist[2])
 
                 V = []
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     V.append(np.cross(axiss[g], atom.cart - rigid_groups[g][0].cart))
 
                 #11
                 row = [1, 0, 0, 0, 0, 0, 0, x3 * x3, x2 * x2, 0, 0, -2 * x2 * x3, 0, 0, 0, 0, 2 * x3, 0, 0, 0]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     rigid_group = rigid_groups[g]
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][0] * V[g][0], 0, 2 * x3 * V[g][0], -2 * x2 * V[g][0], 2 * V[g][0], 0, 0]
                         row = row + row2
@@ -137,9 +137,9 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
 
                 #22
                 row = [0, 1, 0, 0, 0, 0, x3 * x3, 0, x1 * x1, -2 * x1 * x3, 0, 0, 0, 0, -2 * x3, 0, 0, 0, 0, 2 * x1]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][1] * V[g][1], -2 * x3 * V[g][1], 0, 2 * x1 * V[g][1], 0, 2 * V[g][1], 0]
                         row = row + row2
@@ -148,9 +148,9 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
 
                 #33
                 row = [0, 0, 1, 0, 0, 0, x2 * x2, x1 * x1, 0, -2 * x1 * x2, 0, 0, 0, 0, 0, 2 * x2, 0, -2 * x1, 0, 0]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][2] * V[g][2], 2 * x2 * V[g][2], -2 * x1 * V[g][2], 0, 0, 0, 2 * V[g][2]]
                         row = row + row2
@@ -159,9 +159,9 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
 
                 #12
                 row = [0, 0, 0, 1, 0, 0, 0, 0, -x1 * x2, -x3 * x3, x2 * x3, x1 * x3, -x3, x3, 0, 0, 0, 0, x1, -x2]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][0] * V[g][1], -x3 * V[g][0], 2 * x3 * V[g][1], x1 * V[g][0] - x2 * V[g][1],
                                 V[g][1], V[g][0], 0]
@@ -171,9 +171,9 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
 
                 #13
                 row = [0, 0, 0, 0, 1, 0, 0, -x1 * x3, 0, x2 * x3, -x2 * x2, x1 * x2, x2, 0, 0, 0, -x1, x3, 0, 0]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][0] * V[g][2], x2 * V[g][0], x3 * V[g][2] - x1 * V[g][0], -x2 * V[g][2], V[g][2], 0,
                                 V[g][0]]
@@ -183,9 +183,9 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
 
                 #23
                 row = [0, 0, 0, 0, 0, 1, -x2 * x3, 0, 0, x1 * x3, x1 * x2, -x1 * x1, 0, -x1, x2, -x3, 0, 0, 0, 0]
-                for g in xrange(num_groups):
+                for g in range(num_groups):
                     if not atom in rigid_group:
-                        for _ in xrange(7): row.append(0)
+                        for _ in range(7): row.append(0)
                     else:
                         row2 = [V[g][1] * V[g][2], x2 * V[g][1] - x3 * V[g][2], -x1 * V[g][1], x1 * V[g][2], 0, V[g][2],
                                 V[g][1]]
@@ -197,13 +197,13 @@ def prep_data2ls_srb(data, rigid_groups, rigid_namess, axiss, useH=False):
                     adplist_sum = atom.adp['cart_meas']
                     adplist_int = atom.adp['cart_int']
                     adplist = []
-                    for m in xrange(len(adplist_sum)):
+                    for m in range(len(adplist_sum)):
                         if uncorrelate:
                             adplist.append(adplist_sum[m] - adplist_int[m])
                         else:
                             adplist.append(adplist_sum[m])
 
-                    for i in xrange(len(adplist)):
+                    for i in range(len(adplist)):
                         y.append(adplist[i])
 
     A = np.array(A)
@@ -235,7 +235,7 @@ def fit_tls(data, srb):
     #===========================================================================
     rest = np.array(v[20:])
     R = []
-    for g in xrange(len(rest) / 7):
+    for g in range(len(rest) / 7):
         #=======================================================================
         # R.append(np.matrix([[v[20+1+g*7],v[20+4+g*7],v[20+5+g*7]],[v[20+4+g*7],v[20+2+g*7],v[20+6+g*7]],[v[20+5+g*7],v[20+6+g*7],v[20+3+g*7]]]))
         #=======================================================================
@@ -281,7 +281,7 @@ def apply_tls(Utls, indexlist=None, srb=False):
     if srb:
         pass
     # m=np.linalg.pinv(data['exp'].frac2cartmatrix)
-    for i in xrange(len(Utls) / 6):
+    for i in range(len(Utls) / 6):
         data['exp'].atoms[i].adp['cart_ext'] = Utls[i * 6:i * 6 + 6]
         data['exp'].atoms[i].adp['cart_sum'] = data['exp'].atoms[i].adp['cart_int'] \
                                                + data['exp'].atoms[i].adp['cart_ext']
@@ -337,10 +337,10 @@ def segment(srb):
             namesets.append(nameset)
 
         hierachy = []
-        for i in xrange(len(namesets)):
+        for i in range(len(namesets)):
             hierachy.append([0, i])
             group1 = namesets[i]
-            for j in xrange(len(namesets)):
+            for j in range(len(namesets)):
                 group2 = namesets[j]
                 if not group1 == group2:
                     if group1.issubset(group2):
@@ -355,7 +355,7 @@ def segment(srb):
             sorted_rigid_names.append(rigid_names[hierach[1]])
             sorted_axiss.append(axiss[hierach[1]])
         #sys.exit()
-        print [i for i in sorted_rigid_names]
+        print([i for i in sorted_rigid_names])
 
     else:
         sorted_rigid_groups = rigid_groups

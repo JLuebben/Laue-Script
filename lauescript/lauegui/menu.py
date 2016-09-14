@@ -17,7 +17,7 @@ class Main_Menu(BoxLayout):
         self.load_button = Button(text='Load', size_hint=(1, None), height=30)
         self.load_button.bind(on_release=self.main_window.loading_dialog)
         self.add_widget(self.load_button)
-        for _ in xrange(10):
+        for _ in range(10):
             self.add_widget(Button(text='test', size_hint=(1, None), height=30))
         self.editor = Editor(size_hint=(1, .3))
         self.add_widget(self.editor)

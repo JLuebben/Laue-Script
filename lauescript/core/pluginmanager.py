@@ -5,9 +5,12 @@ Created on Jan 22, 2014
 
 Class implementing the plugin manager.
 """
+from __future__ import print_function
+
 import imp
-from sys import argv
 from os import listdir
+from sys import argv
+
 try:
     from ConfigParser import ConfigParser
 except ImportError:
@@ -32,7 +35,6 @@ class PluginManager(object):
     A class for managing plugins, cmd line options,
     output formatting, data logging and data exchange.
     """
-
 
     def __init__(self,
                  headline=None,
@@ -90,6 +92,7 @@ class PluginManager(object):
         macro_file: A String. Created macros will be stored in the
                     file with the path 'macro_file'.
         """
+        self.callStack = []
         all_managers.append(self)
         self.actions = []
         self.options = {}
@@ -142,9 +145,9 @@ class PluginManager(object):
 
         self.printer('\nConfiguration complete.')
         self.start()
-        #=======================================================================
+        # =======================================================================
         # self.preprocess()
-        #=======================================================================
+        # =======================================================================
 
     def start(self):
         self.alpha(self)
@@ -349,82 +352,41 @@ class PluginManager(object):
             self.mute()
 
     def parse_argv(self, argv):
-        """
-        Parses the commandline string and assigns the specified
-        parameters to the specified plugin. The order of the
-        commands is used to determine the order of execution.
-        The attribute .action is created containing a sorted
-        list of commands to carry out.
-        The attribute .options is created containing a dictionary
-        that links a dictionary of options keyed to the corresponding
-        action. The options dictionary contains at least the the
-        key 'options' that holds a list of all options that have
-        no additional arguments. Arguments with additional arguments
-        , as specified in the plugins global 'OPTIONS_ARGUMENTS'
-        variable, are stored in a list keyed to the option name.
-        Currently, only one argument can be assigned to an option.
-        Therefore the list holding the argument is always of length
-        one.
-        It is also possible to execute a module more than one
-        time with different options. To manage the options in
-        these cases action and option key get trailing underscores
-        that are removed prior to execution.
-        Actions and commands that can not be assigned to any
-        module are ignored.
-        Arguments that stand before any other Action are considered
-        global and are stored in the .options dictionary under
-        the key 'global'.
-
-        """
-        global_arg_opts = ['load', 'temp']
-        self.printer('\nParsing commandline arguments.')
         self.actions = []
         self.options = {}
-        key = 'global'
-        arg_opt_key = 'options'
-        self.options[key] = {'options': []}
-        for arg in argv[1:]:
-            #===================================================================
-            # if arg.lstrip('-') in self.reserved_keys:
-            #     key='global'
-            #===================================================================
-            if not arg.startswith('-'):
-                try:
-                    if arg in self.plugins[key.rstrip('_')].OPTION_ARGUMENTS:
-                        arg_opt_key = arg
-                        self.options[key][arg_opt_key] = []
-                        continue
-                except AttributeError:
-                    pass
-                except KeyError:
-                    pass
-                if key == 'global' and arg in global_arg_opts:
-                    arg_opt_key = arg
-                    self.options[key][arg_opt_key] = []
-                    continue
-                self.options[key][arg_opt_key].append(ARG(arg))
-                arg_opt_key = 'options'
-                if key == '_':
-                    self.printer('   Ignoring argument: {}'.format(arg))
-            else:
-                key = self.check_key(arg.lstrip('-'))
-                if not key.rstrip('_') in self.plugins.keys() and not key.rstrip('_') in self.reserved_keys:
-                    self.printer('Unrecognized command: -{}'.format(key))
-                    key = '_'
-                self.actions.append(key)
-                arg_opt_key = 'options'
-                self.options[key] = {'options': []}
+        currentAction = argv[1].lstrip('-')
         try:
-            del self.options['_']
-            self.actions.remove('_')
-        except:
-            pass
-        for arg in self.reserved_keys:
-            try:
-                self.actions.remove(arg)
-            except:
-                pass
-
+            currentOptions = {i: j for i, j in self.plugins[currentAction].OPTION_ARGUMENTS.items()}
+        except AttributeError:
+            currentOptions = {}
+        args = len(argv)
+        i = 2
+        while i < args:
+            arg = argv[i]
+            if arg.startswith('-'):
+                arg = arg.lstrip('-')
+                self.actions.append(currentAction)
+                self.options[currentAction] = currentOptions
+                currentAction = self.check_key(arg)
+                try:
+                    currentOptions = {i: j for i, j in self.plugins[currentAction.rstrip('_')].OPTION_ARGUMENTS.items()}
+                except AttributeError:
+                    currentOptions = {}
+                i += 1
+                continue
+            if arg in currentOptions:
+                currentOptions[arg] = ARG(argv[i + 1])
+                i += 2
+                continue
+            currentOptions[arg] = True
+            i += 1
+        self.actions.append(currentAction)
+        self.options[currentAction] = currentOptions
+        # print(self.actions)
+        # for action in self.actions:
+        #     print(action)
+        #     for key, value in self.options[action].items():
+        #         print('  ',key,value)
 
     def check_key(self, key):
         """
@@ -433,9 +395,8 @@ class PluginManager(object):
         """
         if key in self.options.keys():
             key += '_'
-            key = self.check_key(key)
+            return self.check_key(key)
         return key
-
 
     def scan_for_plugins(self):
         """
@@ -456,7 +417,7 @@ class PluginManager(object):
                 self.plugins[self.plugins[plugin].KEY] = self.plugins[plugin]
                 if not self.plugins[plugin].KEY == plugin:
                     renamelist.append(plugin)
-            except:
+            except AttributeError:
                 self.printer('No KEY found in module {}. Ignoring module.'.format(plugin))
         for plugin in renamelist:
             del self.plugins[plugin]
@@ -467,7 +428,6 @@ class PluginManager(object):
         :return: String representing the plugin directory path.
         """
         return self.path
-
 
     def execute(self):
         """
@@ -481,7 +441,6 @@ class PluginManager(object):
         self.printer.bottomline(self.bottomline)
         self.printer.last()
 
-
     def call(self, action, options=None, headline=True):
         """
         Calls the 'run()' method of the plugin module
@@ -491,11 +450,20 @@ class PluginManager(object):
         corresponding values from self.options are
         taken.
         """
+        self.callStack.append(action)
         self.current_headline_state = headline
         self.current_option = None
         self.current_action = action
         if options:
-            self.current_option = options
+            try:
+                self.current_option = self.plugins[action].OPTION_ARGUMENTS
+            except AttributeError:
+                self.current_option = options
+            else:
+                self.current_option.update(options)
+        # if self.current_option:
+        #     for key,value in self.current_option.items():
+        #         print(key,value)
         action = action.rstrip('_')
         self.moduledepth += 5
         self.printer_list.append(apd_printer(self.moduledepth, self.plugins[action].__name__))
@@ -508,43 +476,23 @@ class PluginManager(object):
         self.printer_list = self.printer_list[:-1]
         self.moduledepth -= 5
         self.delta(self)
+        self.callStack.pop(-1)
+        self.current_option = None
 
-
-    def arg(self, key, global_arg=False):
-        """
-        Returns the value of the argument option linked to
-        'key' or True/False if the option has no argument.
-        If 'global_arg' is True, the global arguments are
-        searched for the given key.
-        If 'global_arg' is False, both, the module specific
-        and the global arguments are searched. If the key
-        is found in both, the module specific one is returned.
-        """
+    def arg(self, key):
         if self.current_option:
-            return self.current_arg(key)
-        value = False
-        use = self.current_action
-
-        if global_arg:
-            use = 'global'
-        if use in self.options.keys():
             try:
-                value = self.options[use][key][0]
-            except:
-                if key in self.options[use]['options']:
-                    value = True
-        if not value and not global_arg:
-            value = self.arg(key, True)
-        if not value and hasattr(self.plugins[self.current_action],'OPTION_ARGUMENTS'):
-            if key in self.plugins[self.current_action].OPTION_ARGUMENTS:
-                try:
-                    value = self.plugins[self.current_action].OPTION_ARGUMENTS[key]
-                except TypeError:
-                    value = None
-                    print('Warning: OPTION_ARGUMENTS in module {} should be a dictionary type.'\
-                        .format(self.plugins[self.current_action].__file__))
-
-        return value
+                return self.current_option[key]
+            except KeyError:
+                return False
+        currentAction = self.callStack[-1]
+        options = self.options[currentAction]
+        try:
+            value = options[key]
+        except KeyError:
+            return False
+        else:
+            return value if not type(value) is ARG else value()
 
     def current_arg(self, key):
         """
@@ -558,7 +506,6 @@ class PluginManager(object):
             if key in self.current_option['options']:
                 value = True
         return value
-
 
     def setup(self):
         """
@@ -575,12 +522,12 @@ class PluginManager(object):
                 self.printer_list[-1].headline()
             else:
                 self.printer_list[-1].headline(self.plugins[self.current_action].HEADLINE)
-        #=======================================================================
+        # =======================================================================
         # if not self.current_option:
         #     mo=self.options[self.current_action]
         # else:
         #     mo=self.current_option
-        #=======================================================================
+        # =======================================================================
 
         return self.printer_list[-1]
 
@@ -600,14 +547,19 @@ class PluginManager(object):
         sys.argv = self.argv
 
 
-class ARG(str):
+class ARG(object):
     """
     Class representing a command line argument
     """
 
     def __init__(self, value):
-        super(ARG, self).__init__(value)
-        self.list = self.split(':')
+        self.str = value
+        self.list = value.split(':')
+        if len(self.list) == 1:
+            self.list = None
+
+    def __str__(self):
+        return self.str
 
     def __getitem__(self, i):
         try:
@@ -615,4 +567,7 @@ class ARG(str):
         except:
             raise IndexError
 
-
+    def __call__(self):
+        if self.list:
+            return self.list
+        return self.str

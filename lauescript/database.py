@@ -6,6 +6,7 @@ Created on Nov 1, 2013
 Module containing functionality related to the creation of
 APD-database files.
 """
+from __future__ import print_function
 import os
 from os import walk, listdir
 
@@ -26,7 +27,7 @@ def daba_generator(data, frequency_cutoff):
     pathlist = []
     namedict = {}
     invlist = []
-    print '\nRunning database generator!\n'
+    print('\nRunning database generator!\n')
     filepointer = open('DABA.txt')
     nameswitch = False
     for line in filepointer.readlines():
@@ -51,15 +52,15 @@ def daba_generator(data, frequency_cutoff):
                                    dabamode=True, errorlog=errorlog)
     datalist2 = [i for i in datalist if i is not None]
     # ===========================================================================
-    # invlist2=[invlist[i] for i in xrange(len(invlist))\
+    # invlist2=[invlist[i] for i in range(len(invlist))\
     #                      if not datalist[i]==None]
     # ===========================================================================
-    pathlist2 = [pathlist[i] for i in xrange(len(pathlist)) \
+    pathlist2 = [pathlist[i] for i in range(len(pathlist)) \
                  if datalist[i] is not None]
     invmollist = []
     for path in pathlist2:
         invmollist.append(path.split('/')[-4])
-    print 'Parsing frequency information...'
+    print('Parsing frequency information...')
     global alldata
     alldata1, warninglist = extract_single_freqencies_from_list(datalist2,
                                                                 invmollist,
@@ -72,12 +73,12 @@ def daba_generator(data, frequency_cutoff):
     for path in pathlist2:
         invmollist.append(path.split('/')[-4])
 
-    print 'Setting up data structure...'
+    print('Setting up data structure...')
     dabacounter = 0
     for invmol in invmollist:
         dabacounter += 1
         if dabacounter % 400 == 0:
-            print '...'
+            print('...')
         try:
             i = invmollist.index(invmol)
             data.add_molecule(str(vars()['invmol']), daba=True)
@@ -103,7 +104,7 @@ def daba_generator(data, frequency_cutoff):
     # ===========================================================================
     # count=0
     # ===========================================================================
-    print 'Starting calculations...'
+    print('Starting calculations...')
     data.update(dabamode=True, errorlog=errorlog)
 
 
@@ -224,7 +225,7 @@ def read_multiple_files(filelist, comlist, dabamode=False, errorlog=None):
     for data in comlist:
         count += 1
         if count % 50 == 0:
-            print '...' + str(count) + ' files read...'
+            print('...' + str(count) + ' files read...')
         if dabamode:
             name = data.split('/')[-4]
             data = data[:-11] + name + '.log'
@@ -248,21 +249,21 @@ def extract_single_freqencies_from_list(datalist, filelist, cutoff=-1):
     of frequencies <=0.
     """
     alldata = {i: [] for i in filelist}
-    print alldata
+    print(alldata)
     # ===========================================================================
     # counter=0
     # ===========================================================================
     warninglist = []
     dabacounter = 0
-    for j in xrange(len(datalist)):
+    for j in range(len(datalist)):
         dabacounter += 1
         if dabacounter % 400 == 0:
-            print '...'
+            print('...')
         freqcounter = 0
         try:
             for block in datalist[j][1:]:
 
-                for i in xrange(5):
+                for i in range(5):
                     alldata[filelist[j]].append([])
                 freqheader = (False, False)
                 for line in block:
@@ -276,7 +277,7 @@ def extract_single_freqencies_from_list(datalist, filelist, cutoff=-1):
                             freqcounter += 1
                         freqcounter -= len(freqheader)
                 freqcounter += 5
-                for i in xrange(4):
+                for i in range(4):
                     if len(alldata[filelist[j]][-1]) == 0:
                         del alldata[filelist[j]][-1]
             if cutoff > 0:
@@ -310,7 +311,7 @@ def extract_single_freqency(data, compound_name, cutoff=0):
 
     for block in data[1:]:
 
-        for i in xrange(5):
+        for i in range(5):
             frequency_data.append([])
         freqheader = (False, False)
         for line in block:
@@ -325,7 +326,7 @@ def extract_single_freqency(data, compound_name, cutoff=0):
                         freqcounter += 1
                     freqcounter -= len(freqheader)
         freqcounter += 5
-        for i in xrange(4):
+        for i in range(4):
             if len(frequency_data[-1]) == 0:
                 del frequency_data[-1]
     if cutoff > 0:

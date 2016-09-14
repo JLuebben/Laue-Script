@@ -55,10 +55,10 @@ class apd_table(object):
         A loop calling print of every sting in self.strings would
         print to table.
         """
-        self.space = [0 for _ in xrange(self.width)]
+        self.space = [0 for _ in range(self.width)]
         for i, _ in enumerate(self.columns):
             self.space[i] = max([len(row[i]) for row in self.body if row[0] is not None])
-        self.strings = ['' for _ in xrange(len(self.body))]
+        self.strings = ['' for _ in range(len(self.body))]
         self.maxwidth = sum(self.space) + len(self.space) * 3 + 1
         for i, row in enumerate(self.body):
             if row[0] is None:
@@ -162,7 +162,7 @@ class apd_printer(object):
         The string 'question' will be indented correctly and
         placed before the input prompt.
         """
-        return raw_input(self.line_start + '{} :'.format(question))
+        return input(self.line_start + '{} :'.format(question))
 
     def __call__(self, *args, **kwargs):
         """
@@ -362,7 +362,7 @@ class apd_printer(object):
 
         'char' must be a string of arbitrary length.
         """
-        l = len(arg) / len(char) + 4
+        l = len(arg) // len(char) + 4
         self()
         self(char * l)
         self('{0} {1:{2}} {0}'.format(char, arg, (l - 2) * len(char) - 2))

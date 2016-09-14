@@ -27,8 +27,8 @@ def get_adp_as_matrix(adp):
 #     besti=None
 #     eigval1,eigvec1=np.linalg.eig(adp1)
 #     eigval2,eigvec2=np.linalg.eig(adp2)
-#     for i in xrange(3):
-#         for j in xrange(3):
+#     for i in range(3):
+#         for j in range(3):
 #             check=np.dot(eigvec1[:,i],eigvec2[:,j])
 #             if check < 0: check=check *-1
 #             if check > bestcheck: besti=(i,j)
@@ -128,9 +128,9 @@ def get_full_matrix():
     and one column for every atom.
     """
     global data
-    matrix = [[0 for i in xrange(len(data['exp'].atoms))] for _ in xrange(len(data['exp'].atoms))]
-    for i in xrange(len(data['exp'].atoms)):
-        for j in xrange(len(data['exp'].atoms)):
+    matrix = [[0 for i in range(len(data['exp'].atoms))] for _ in range(len(data['exp'].atoms))]
+    for i in range(len(data['exp'].atoms)):
+        for j in range(len(data['exp'].atoms)):
             atom1 = data['exp'].atoms[i]
             atom2 = data['exp'].atoms[j]
             if not i == j:
