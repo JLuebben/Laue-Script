@@ -41,7 +41,7 @@ class ElementOfNumber(Table):
         item = item.lstrip('0')
         item = item.rstrip('-+')
         item = item.capitalize()
-        return super(ElementOfNumber, self).__getitem__(item)
+        return self.data[item]
 
 elementofnumber = ElementOfNumber()
 

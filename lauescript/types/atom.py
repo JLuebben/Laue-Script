@@ -10,7 +10,7 @@ from numpy.linalg import eig
 from numpy.linalg import norm
 from lauescript.cryst.transformations import ADP_to_matrix, ADP_to_XD_list, frac2cart, cart2frac, frac2cart_ADP, cart2frac_ADP
 from lauescript.cryst.transformations import frac2cart_ADP, cart2frac_ADP
-from lauescript.cryst.tables import halogens, elementofnumber
+from lauescript.cryst.tables import halogens, elementofnumber, proton_number
 from lauescript.cryst.geom import get_framework_neighbors
 import lauescript.cryst.crystgeom as cg
 from lauescript.core.core import apd_exit
@@ -375,7 +375,7 @@ class ATOM(AtomInterface):
                         pos2 = neighbor0.cart
                         pos3 = cg.get_closest_atom_of_element(self.element, neighbor0, exclude=self).cart
                         plane_vector = cg.get_normal_vector_of_plane(pos1, pos2, pos3)
-                        ref_element = max([cg.proton_number[i] for i in neighbors])
+                        ref_element = max([proton_number[i] for i in neighbors])
                         ref_atom = cg.get_closest_atom_of_element(elementofnumber[ref_element], neighbor0,
                                                                   exclude=self)
                         ref_vector = neighbor0.cart - ref_atom.cart
