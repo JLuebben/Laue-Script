@@ -135,81 +135,42 @@ class XDIOP(IOP):
         self.element = {}
         self.multipoles = {}
         self.T = None
-        switch = False
-        counter = 0
-        recordlength = 999
-        atomFound = False
-
+        lineCounter = -1
+        recLength = None
+        stop = False
         for raw_line in self.content:
+
             line = raw_line[:-1].split()
             if not line:
                 continue
+            if stop:
+                self.body.append(raw_line)
+                continue
+
             isAtomStart = True if '(' in line[0] else False
-            isAtomRecord = True if atomFound and not counter > recordlength else False
-            if atomFound and isAtomStart:
-                self.parse_atom_record()
-                atomFound = True
-                if not recordlength:
-                    recordlength = counter
-                if recordlength > 998:
-                    recordlength = 0
-                counter = 0
-                self.current_atom_record = line
-            elif isAtomStart:
-                atomFound = True
-                self.current_atom_record += line
-                counter += 1
-            elif atomFound:# and isAtomRecord and not isAtomStart:
-                if not isAtomRecord and not isAtomStart and recordlength>0:
+            if lineCounter < 0 and isAtomStart and not recLength:
+                lineCounter = 0
+            elif isAtomStart and not recLength:
+                recLength = lineCounter
+                lineCounter -=1
+            if not lineCounter < 0:
+                lineCounter += 1
+                if lineCounter == recLength:
+                    # print' PARSE NOW'
+                    # print '---------------------------', raw_line
                     self.parse_atom_record()
-                    atomFound = False
+                    self.current_atom_record = line
+                    lineCounter = 0
+                    if not isAtomStart:
+                        stop = True
+                        self.body.append(raw_line)
+                        continue
                 else:
-                    counter += 1
                     self.current_atom_record += line
             else:
                 self.body.append(raw_line)
-            # print atomFound, isAtomRecord,isAtomStart
+            continue
 
-        # for raw_line in self.content:
-        #     if not raw_line[:-1]:
-        #         if self.current_atom_record:
-        #             self.parse_atom_record()
-        #             counter = 0
-        #         continue
-        #     if raw_line.startswith('USAGE'):
-        #         self.body.append(raw_line)
-        #         switch = True
-        #         continue
-        #     if not switch:
-        #         self.body.append(raw_line)
-        #         continue
-        #     if not raw_line[0] == '!':
-        #         if not raw_line[0] == ' ':
-        #             atomFound = True
-        #         newRec = True if not raw_line[0] == ' ' else False
-        #         line = [i for i in raw_line[:-1].split(' ') if i]
-        #         # print self.current_atom_record, newRec, counter
-        #         if self.current_atom_record and newRec and '(' in self.current_atom_record[0]:# or counter > 3:
-        #             self.parse_atom_record()
-        #             if not recordlength:
-        #                 recordlength = counter
-        #             if recordlength < 0:
-        #                 recordlength = 0
-        #             counter = 0
-        #
-        #         # if len(line) == 0:
-        #         #     continue
-        #         if not newRec:
-        #             self.current_atom_record += line
-        #             counter += 1
-        #         else:
-        #             self.current_atom_record = line
-        #     else:
-        #         self.body.append(raw_line)
-        #     if not atomFound:
-        #         self.body.append(raw_line)
-        # if self.current_atom_record:
-        #     self.parse_atom_record()
         for name, atom in self.atoms.items():
             self.cart[name] = atom.get_cart()
             self.frac[name] = atom.get_frac()
