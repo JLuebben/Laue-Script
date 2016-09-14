@@ -492,7 +492,7 @@ class PluginManager(object):
         except KeyError:
             return False
         else:
-            return value if not type(value) is ARG else str(value)
+            return value if not type(value) is ARG else value()
 
     def current_arg(self, key):
         """
@@ -555,6 +555,8 @@ class ARG(object):
     def __init__(self, value):
         self.str = value
         self.list = value.split(':')
+        if len(self.list) == 1:
+            self.list = None
 
     def __str__(self):
         return self.str
@@ -564,3 +566,8 @@ class ARG(object):
             return self.list[i]
         except:
             raise IndexError
+
+    def __call__(self):
+        if self.list:
+            return self.list
+        return self.str

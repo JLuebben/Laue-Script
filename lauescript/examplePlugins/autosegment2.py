@@ -35,7 +35,7 @@ def autosegment():
     except:
         printer('\nNo hirshfeld test data found. Calling hirshfeld'
                 ' test module.')
-        options = {'options': ['full']}
+        options = {'full': True}
         config.call('H', options)
         matrix = data['exp'].hirshfeld_matrix
         hirshfeld_list = data['exp'].hirshfeld_list
@@ -126,11 +126,11 @@ def start_fit(groups):
             for definition in tls_definitions:
                 if any([atom in mol for atom in definition[1:]]):
                     rigid = False
-                    options = {'options': ['auto'], 'molecule': ['{}'.format(i + 1)]}
+                    options = {'auto': True, 'molecule': '{}'.format(i + 1)}
                     config.call('T2', options)
                     break
             if rigid:
-                options = {'options': [], 'molecule': ['{}'.format(i + 1)]}
+                options = {'molecule': '{}'.format(i + 1)}
                 config.call('T2', options)
 
         else:

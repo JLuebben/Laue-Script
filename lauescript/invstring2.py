@@ -176,7 +176,7 @@ def get_invariom_names(names,
 
 def newAge(invariomName, atom, generator, i):
     # try:
-        heavyAtom = atom.get_bonds().values()[0].get_partner(atom)
+        heavyAtom = list(atom.get_bonds().values())[0].get_partner(atom)
         return '&'.join([invariomName, generator.get_invariom_name_of(heavyAtom.get_name(), i)])
     # except IndexError:
     #     return invariomName
@@ -1380,7 +1380,7 @@ class Enviroment(object):
         priorities = chain.branch_priorities.values()
         unique_atoms = []
         for i, priority in enumerate(priorities):
-            if priorities.count(priority) == 1:
+            if list(priorities).count(priority) == 1:
                 unique_atoms.append(i)
         if len(unique_atoms) > 0:
             self.o_atom_2 = chain_atoms[unique_atoms[0]]

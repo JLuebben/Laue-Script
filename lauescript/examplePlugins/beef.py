@@ -83,7 +83,7 @@ def run(pluginManager):
         for element, values in details(data).items():
             printer('{:>3}: {:5.3f}'.format(element, mean(values)))
     if pluginManager.arg('write'):
-        options = {'options': ['full'], 'use': ['beef']}
+        options = {'full': True, 'use': 'beef'}
         pluginManager.call('W', options)
 
 def details(data):
