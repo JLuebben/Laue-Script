@@ -24,7 +24,7 @@ class MoleculeInterface(object):
     def __init__(self):
         self.atom_dict = {}
         self.bonds = {}
-        self.atoms = {}
+        self.atoms = []
 
     def add_atom(self, atom):
         self.atom_dict[atom.get_id()] = atom
