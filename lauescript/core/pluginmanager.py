@@ -461,6 +461,12 @@ class PluginManager(object):
                 self.current_option = options
             else:
                 self.current_option.update(options)
+        else:
+            try:
+                self.current_option = self.plugins[action].OPTION_ARGUMENTS
+            except AttributeError:
+                self.current_option = {}
+
         # if self.current_option:
         #     for key,value in self.current_option.items():
         #         print(key,value)
