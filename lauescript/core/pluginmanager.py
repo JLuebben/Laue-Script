@@ -435,13 +435,13 @@ class PluginManager(object):
         the cmdline arguments.
         """
         for action in self.actions:
-            self.call(action)
+            self.call(action, dynamic=False)
         self.omega(self)
         self.printer.unmute()
         self.printer.bottomline(self.bottomline)
         self.printer.last()
 
-    def call(self, action, options=None, headline=True):
+    def call(self, action, options=None, headline=True, dynamic=True):
         """
         Calls the 'run()' method of the plugin module
         referenced by 'action'. The optional argument
@@ -461,6 +461,12 @@ class PluginManager(object):
                 self.current_option = options
             else:
                 self.current_option.update(options)
+        elif dynamic:
+            try:
+                self.current_option = self.plugins[action].OPTION_ARGUMENTS
+            except AttributeError:
+                self.current_option = {}
+
         # if self.current_option:
         #     for key,value in self.current_option.items():
         #         print(key,value)

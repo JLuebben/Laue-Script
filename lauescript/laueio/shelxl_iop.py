@@ -293,27 +293,27 @@ class ShelxlIOP(IOP):
 
 
                 if line.startswith('CELL'):
-                    self.cell = [i for i in line.rstrip('\n').split(' ') if len(i) > 0][2:]
+                    self.cell = [i for i in line.rstrip().split(' ') if len(i) > 0][2:]
                     self.cell = [float(i) for i in self.cell]
                 elif line.startswith('SFAC'):
-                    sfac_cart = [i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]
+                    sfac_cart = [i for i in line.rstrip().split(' ') if len(i) > 0][1:]
                     self.sfac_line = j
                 elif line.startswith('FVAR'):
-                    self.fvars += [i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]
+                    self.fvars += [i for i in line.rstrip().split(' ') if len(i) > 0][1:]
                     self.fvar_line = j
                 elif line.startswith('TEMP'):
-                    self.T = self.T_value([i for i in line.rstrip('\n').split(' ') if len(i) > 0][-1])
+                    self.T = self.T_value([i for i in line.rstrip().split(' ') if len(i) > 0][-1])
                 elif line.startswith('SYMM'):
                     self.symmetry.append(
-                        ' '.join([i for i in line.rstrip('\n').split(' ') if len(i) > 0][1:]).split(','))
+                        ' '.join([i for i in line.rstrip().split(' ') if len(i) > 0][1:]).split(','))
                 elif line.startswith('LATT'):
-                    self.lattice = [i for i in line.rstrip('\n').split(' ') if len(i) > 0][-1]
+                    self.lattice = [i for i in line.rstrip().split(' ') if len(i) > 0][-1]
                 elif any([line.startswith(string) for string in ['PART', 'Part', 'part']]):
-                    part = line.rstrip('\n').partition(' ')[2]
+                    part = line.rstrip().partition(' ')[2]
                 elif line.startswith('AFIX'):
                     current_AFIX = line
                 elif line.upper().startswith('RESI'):
-                    words = line.rstrip('\n').split()
+                    words = line.rstrip().split()
                     number = words[1]
                     try:
                         name = words[2]
@@ -331,7 +331,7 @@ class ShelxlIOP(IOP):
                     end = True
 
 
-                new_content.append(line.rstrip('\n'))
+                new_content.append(line.rstrip())
             elif line[0] in ascii_letters and not end:
                 atom = ShelxlAtom(line, sfac_cart, self.cell, part=part, prefix=current_AFIX, residue=self.activeResidue[0])
                 current_AFIX = ''

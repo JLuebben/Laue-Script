@@ -27,10 +27,10 @@ def apd_exit(value=1, message=None, verbose=True):
     printer.unmute()
     if not message:
         if value:
-            message = ['The APD-Toolkit terminated unexpectedly.',
+            message = ['The application terminated unexpectedly.',
                        '\n\n{}'.format(format_exc())]
         else:
-            message = ['The APD-Toolkit terminated correctly.']
+            message = ['']
 
     dosend = config.config.getboolean('Errors', 'reporterrors')
     plusfiles = config.config.getboolean('Errors', 'includeinput')

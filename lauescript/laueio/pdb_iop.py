@@ -387,7 +387,7 @@ class PDBIOP(IOP):
         :return: None
         """
         self.file_content = []
-        atoms = sorted(self.molecule.atoms(), key=attrgetter('serial_number'))
+        atoms = sorted(self.molecule.atoms, key=attrgetter('serial_number'))
 
         for thisatom in atoms:
             self.file_content.append(thisatom)

@@ -24,10 +24,14 @@ class MoleculeInterface(object):
     def __init__(self):
         self.atom_dict = {}
         self.bonds = {}
+        self.atoms = []
 
     def add_atom(self, atom):
         self.atom_dict[atom.get_id()] = atom
-        self.atoms.append(atom)
+        try:
+            self.atoms.append(atom)
+        except AttributeError:
+            pass
 
     def set_cell(self, value):
         self.cell = value
@@ -65,9 +69,9 @@ class MoleculeInterface(object):
         except:
             yield None
 
-    def atoms(self):
-        for atom in self.atom_dict.values():
-            yield atom
+    # def atoms(self):
+    #     for atom in self.atom_dict.values():
+    #         yield atom
 
     def __getitem__(self, name):
         """
