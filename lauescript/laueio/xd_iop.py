@@ -12,6 +12,7 @@ from lauescript.cryst.transformations import frac2cart, \
 from lauescript.laueio.io import IOP
 from lauescript.types.atom import AtomInterface
 from lauescript.core.core import apd_exit
+from collections import OrderedDict
 
 
 class KEY(dict):
@@ -122,7 +123,7 @@ class XDIOP(IOP):
         # self.master_file_name = self.filename.replace('.res', '.mas')
         self.master_file_name = self.filename[:-3] + 'mas'
         self.parse_master_file()
-        self.atoms = {}
+        self.atoms = OrderedDict()
         self.body = []
         self.current_atom_record = []
         self.names = []
