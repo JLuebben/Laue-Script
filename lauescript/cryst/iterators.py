@@ -8,12 +8,15 @@ from os.path import join
 from lauescript.cryst.geom import get_framework_neighbors
 
 
-def database(pluginManager):
+def database(pluginManager, asDict=False):
     path = pluginManager.config.get('APD', 'DatabasePath')
     picklepointer = open(join(path, 'database.pkl'), 'r')
     data = pickle.load(picklepointer)
     picklepointer.close()
-    return data.values()
+    if not asDict:
+        return data.values()
+    else:
+        return data
 
 
 def atoms_of_element(molecule, element='H'):

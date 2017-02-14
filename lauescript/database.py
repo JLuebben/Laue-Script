@@ -92,9 +92,11 @@ def daba_generator(data, frequency_cutoff):
                 data[invmol].atoms[-1].invname = invnames[p]
                 data[invmol].inv = data[invmol]
                 data[invmol].freq = []
+                data[invmol].IRIntensities = []
                 for freq in alldata1[invmol]:
                     if len(freq) > 3:
                         data[invmol].freq.append([freq[0], freq[1]])
+                        data[invmol].IRIntensities.append(freq[3])
                         num = len(data[invmol].atoms) - 1
                         data[invmol].atoms[-1].add_disps(freq[0],
                                                          freq[4 + num * 3:7 + num * 3])
@@ -621,10 +623,15 @@ def add_molecule(data,
                                               frac=positions_dict[atom_name],
                                               molecule=data[compound_name])
 
+
                 for freq in frequency_data:
                     if len(freq) > 3:
                         if atom_name == atom_names_list[0]:
                             data[compound_name].freq.append([freq[0] * frequency_scale, freq[1]])
+                            try:
+                                data[compound_name].IRIntensities.append(freq[3])
+                            except AttributeError:
+                                data[compound_name].IRIntensities = []
                         num = len(data[compound_name].atoms) - 1
                         data[compound_name].atoms[-1].add_disps(freq[0] * frequency_scale,
                                                                 freq[4 + num * 3:7 + num * 3])

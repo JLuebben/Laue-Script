@@ -9,7 +9,7 @@ import hashlib
 
 def getInvariomNames(molecule, printer=None, databasePath=None, findSet=None):
     if not printer:
-        from apd.lib.crystgeom2.apd_printer import apd_printer
+        from lauescript.core.apd_printer import apd_printer
         printer = apd_printer()
     graphs = []
     for graphandname in Graph.molecule2Graphs(molecule):
@@ -220,7 +220,7 @@ class Graph(object):
         coreHash2, len2 = graph2.split('::')[:2]
         if not self.coreHash() == int(coreHash2):
             return 99999
-        diff = self._diffLength(self.getLength(),[float(x) for x in len2.split(',')])
+        diff = self._diffLength(self.getLength(), [float(x) for x in len2.split(',')])
         # if diff > 1:
         #     return 999
         g = Graph()

@@ -38,7 +38,7 @@ class PDBAtom(AtomInterface):
             .format(self.serial_number,
                     self.get_name_prefix(),
                     ' ',
-                    self.get_element(),
+                    self.get_residue(),
                     self.get_residue_number(),
 
                     '{:8.3f}{:8.3f}{:8.3f}'.format(*self.get_cart()),
@@ -59,6 +59,10 @@ class PDBAtom(AtomInterface):
         try:
             return sum(self.get_adp_cart()[:3])/3
         except ValueError:
+            return float(self.get_adp_cart())
+        except TypeError:
+            return float(self.get_adp_cart())
+        except IndexError:
             return float(self.get_adp_cart())
 
     def as_PQR(self):

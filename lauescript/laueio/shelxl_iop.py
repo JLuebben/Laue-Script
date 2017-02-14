@@ -22,7 +22,7 @@ class ShelxlAtom(object):
         self.cell = cell
         self.residue = residue
         self.content = [line.rstrip('\n')]
-        self.name = self.content[0].split(' ')[0] + ('_' + str(self.residue)) if self.residue > 0 else self.content[0].split(' ')[0]
+        self.name = (self.content[0].split(' ')[0] + '_' + str(self.residue)) if self.residue else self.content[0].split(' ')[0]
         self.part = part
         self.adp_updated = False
         self.prefix = prefix
@@ -289,7 +289,7 @@ class ShelxlIOP(IOP):
         current_AFIX = ''
         part = 0
         for j, line in enumerate(self.content):
-            if any([line.startswith(cmd) for cmd in ShelxlIOP.cmds]):
+            if any([line.upper().startswith(cmd) for cmd in ShelxlIOP.cmds]):
 
 
                 if line.startswith('CELL'):
@@ -333,7 +333,7 @@ class ShelxlIOP(IOP):
 
                 new_content.append(line.rstrip())
             elif line[0] in ascii_letters and not end:
-                atom = ShelxlAtom(line, sfac_cart, self.cell, part=part, prefix=current_AFIX, residue=self.activeResidue[0])
+                atom = ShelxlAtom(line, sfac_cart, self.cell, part=part, prefix=current_AFIX, residue=self.activeResidue[1])
                 current_AFIX = ''
                 new_content.append(atom)
                 self.atoms[atom.name] = atom
@@ -551,7 +551,7 @@ class ShelxlIOP(IOP):
                 self.loneInstructions[origin] = [instr]
 
     def _resolveBEDELONE(self):
-        for bedes in self.bedeInstructions.values() + self.loneInstructions.values():
+        for bedes in list(self.bedeInstructions.values()) + list(self.loneInstructions.values()):
             for bede in bedes:
                 for key, param in bede.items():
                     try:
