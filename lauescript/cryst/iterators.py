@@ -10,8 +10,8 @@ from lauescript.cryst.geom import get_framework_neighbors
 
 def database(pluginManager, asDict=False):
     path = pluginManager.config.get('APD', 'DatabasePath')
-    picklepointer = open(join(path, 'database.pkl'), 'r')
-    data = pickle.load(picklepointer)
+    picklepointer = open(join(path, 'database.pkl'), 'rb')
+    data = pickle.load(picklepointer, encoding='latin1')
     picklepointer.close()
     if not asDict:
         return data.values()
