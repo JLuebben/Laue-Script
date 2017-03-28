@@ -372,11 +372,14 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
     # ===========================================================================
     if not clean:
         printer('  Loading saved database state from database.pkl...')
-        import cPickle
+        try:
+            import cPickle
+        except ImportError:
+            import pickle as cPickle
 
         if path:
             try:
-                picklepointer = open(path + '/database.pkl', 'r')
+                picklepointer = open(path + '/database.pkl', 'rb')
             except IOError:
                 apd_exit(2, '\n\nERROR: Cannot find database file at\n  >>>{}<<<\n'
                             'Please check if "~/.APDToolkit.ini" points to the correct location.'.format(path + '/database.pkl'))
@@ -891,11 +894,12 @@ class Log_Buffer(list):
 
     def setup_data(self):
         self.data.give_daba_molecule('micro', properties=[0, 0, 0, 0])
+        self.data['micro'].IRIntensities = []
         self.data.set_temperature([100])
         # datalist = read_frequency_block(self.path, self.errorlog)
         # frequency_data = extract_single_freqency(datalist, 'micro', self.frequency_cutoff)
         # frequency_data = extract_single_freqency(datalist, 'micro', -9999)
-        FrequencyReader(self.path)
+        fReader = FrequencyReader(self.path)
         # for x in frequency_data:
         #     print str(x)[:50]
         positions_list = []
@@ -932,29 +936,33 @@ class Log_Buffer(list):
             #         if not freq[0] > 99999:
             #             self.data['micro'].atoms[-1].add_disps(freq[0] * self.frequency_scale,
             #                                                    freq[4 + num * 3:7 + num * 3])
-
             atom = self.data['micro'].atoms[-1]
             for freq, disps in ProtoAtom.coreAtoms[i].disps.items():
                 if disps[0] == 99999999:
                     continue
-
                 freq = float(freq.split(':')[1])
                 if freq < self.frequency_cutoff:
                     continue
+
                 atom.add_disps(freq * self.frequency_scale, disps[1:])
+
                 if i == 0:
                     # if not freq > 99999:
                     # print freq * self.frequency_scale, disps[0]
                     self.data['micro'].freq.append([freq * self.frequency_scale, disps[0]])
 
+
+
         # Add PseudoMolecules
         for i, pseudoMol in enumerate(ProtoAtom.pseudoMolecules):
             name = 'pointMass_{}'.format(i)
             self.data.give_daba_molecule(name, properties=[0, 0, 0, 0])
+            self.data[name].IRIntensities = []
             self.data[name].give_atom(name=name + 'atom',
                                       element='H',
                                       cart=[pseudoMol.x, pseudoMol.y, pseudoMol.z],
                                       molecule=self.data[name])
+
             atom = self.data[name].atoms[0]
             for freq, disps in pseudoMol.disps.items():
                 if disps[0] == 99999999:
@@ -968,9 +976,14 @@ class Log_Buffer(list):
                 # if not freq > 99999:
                 # print freq * self.frequency_scale, disps[0]
                 self.data[name].freq.append([freq * self.frequency_scale, disps[0]])
+                # self.data[name].IRIntensities.append(freq[3])
+        self.data['micro'].allFrequencies = [(freq.freq, freq.mass) for freq in FrequencyReader.frequencies]
+        for freq in FrequencyReader.frequencies:
+            self.data['micro'].IRIntensities.append(freq.intensity)
 
 
 class FrequencyReader(object):
+    frequencies = []
     def __init__(self, fileName):
         self.counter = 1
         self.frequencies = {}
@@ -989,6 +1002,8 @@ class FrequencyReader(object):
                     self.bufferFrequencies(line)
                 elif 'Reduced masses ---' in line:
                     self.parseMasses(line)
+                elif 'IR Intensities --- ' in line:
+                    self.parseIntensities(line)
                 elif tryblock:
                     try:
                         int(line[3])
@@ -1005,6 +1020,7 @@ class FrequencyReader(object):
         for i, freq in enumerate(line):
             self.columnMap[i] = self.counter
             self.frequencies[self.counter] = Frequency(freq, self.counter)
+            FrequencyReader.frequencies.append(self.frequencies[self.counter])
             self.counter += 1
             # print self.columnMap.items()
 
@@ -1024,6 +1040,23 @@ class FrequencyReader(object):
             chunks.append(chunk)
         for i, mass in enumerate(chunks):
             self.frequencies[self.columnMap[i]].addMass(mass)
+
+    def parseIntensities(self, line):
+        line = line.split('---')[1][1:-1]
+        i = 0
+        chunks = []
+        while True:
+            chunk = line[i:i + 10]
+            i += 10
+            if not chunk:
+                break
+            try:
+                chunk = float(chunk)
+            except ValueError:
+                chunk = 99999999
+            chunks.append(chunk)
+        for i, intensity in enumerate(chunks):
+            self.frequencies[self.columnMap[i]].addIntensity(intensity)
 
     def parseDisplacements(self, line):
         line = [i for i in line.strip().split() if i]
@@ -1059,3 +1092,6 @@ class Frequency(object):
                 protoAtom.addDisplacement(coord, self, disp)
         else:
             protoAtom.addDisplacement(coord, self, disp)
+
+    def addIntensity(self, intensity):
+        self.intensity = intensity
