@@ -14,7 +14,10 @@ def database(pluginManager, asDict=False, overridePath=None):
     else:
         path = overridePath
     picklepointer = open(join(path, 'database.pkl'), 'rb')
-    data = pickle.load(picklepointer, encoding='latin1')
+    try:
+        data = pickle.load(picklepointer, encoding='latin1')
+    except TypeError:
+        data = pickle.load(picklepointer)
     picklepointer.close()
     if not asDict:
         return data.values()

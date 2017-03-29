@@ -386,7 +386,7 @@ class GENERATOR(DATA):
             import pickle as cPickle
 
         f = open('database.pkl', 'wb')
-        cPickle.dump(self, f)
+        cPickle.dump(self, f, protocol=0)
 
     def strip(self):
         """
