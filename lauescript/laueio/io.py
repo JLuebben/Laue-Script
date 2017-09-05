@@ -17,6 +17,7 @@ class IOP(object):
 
     def __init__(self, filename):
         self.filename = filename
+        self.supportsSym = False
         self.T = None
         self.set_id()
         self.symmetry = []

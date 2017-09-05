@@ -15,6 +15,7 @@ from numpy.linalg import norm
 from sys import stdout
 from string import ascii_letters
 from lauescript.cryst.rings import find_planar_rings
+from lauescript.cryst.transformations import cart2frac
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -143,7 +144,7 @@ def get_invariom_names(names,
 
     generator = InvariomGenerator(thresholds)
     if cart:
-        generator.populate(names, cart, system='cart', planarityThreshold=planarityThreshold)
+        generator.populate(names, cart, system='cart', cell=cell, planarityThreshold=planarityThreshold)
     elif frac:
         generator.populate(names, frac, system='frac', cell=cell, planarityThreshold=planarityThreshold)
 
@@ -463,9 +464,10 @@ class InvariomGenerator(object):
         :param cell: List of six floats representing cell parameters
         of the format [a, b, c, alpha, beta, gamma]
         """
-        atom = Atom(name)
+        atom = Atom(name, cell)
         if system == 'cart':
             atom.set_cart(coord)
+            atom.frac = cart2frac(coord, cell)
         elif system == 'frac':
             atom.set_frac(coord, cell)
         # =======================================================================
@@ -494,10 +496,28 @@ class InvariomGenerator(object):
             print('invsting2.py: Error. Cell missing.')
             exit()
 
+        if system == 'frac':
+            samples2 = [cart2frac(i, cell) for i in coordinates]
+        else:
+            samples2 = coordinates
         samples = coordinates
 
-        self.neigh.fit(samples)
-        self.dist_result = self.neigh.kneighbors(samples, len(samples), return_distance=False)
+        dist_results = []
+        for pos1 in samples2:
+            dists = []
+            for i, pos2 in enumerate(samples2):
+                d = Bond.dist(pos1, pos2, cell)
+                dists.append((d, i))
+            dists = sorted(dists, key=lambda pair: pair[0])
+            dist_results.append([d[1] for d in dists])
+
+
+        # self.neigh.fit(samples)
+        # for n in names:
+        #     print(n)
+        # self.dist_result = self.neigh.kneighbors(samples, len(samples), return_distance=False)
+        self.dist_result = dist_results
+        # print(self.dist_result)
 
         for _ in range(len(self.thresholds)):
             self.next()
@@ -506,7 +526,7 @@ class InvariomGenerator(object):
                 self.create_atom(name, coordinates[i], system, cell)
             self.generate_bonds()
             self.generate_angles()
-            self.find_rings(planarityThreshold)
+            self.find_rings(planarityThreshold, cell)
             self.grow_enviroments()
             for name, atom in self.atoms.items():
                 if invfilter.correct(atom.enviroment):
@@ -555,7 +575,7 @@ class InvariomGenerator(object):
                 self.anglehashes.append(angle.hash)
                 atom.add_angle(angle)
 
-    def find_rings(self, planarityThreshold):
+    def find_rings(self, planarityThreshold, cell):
         """
         Uses the RingFinder class to find rings in the molecule
         and communicates the obtained information to the
@@ -563,7 +583,10 @@ class InvariomGenerator(object):
         """
         # finder = RingFinder(self.angles, self.anglehashes)
         # rings = finder.harvest()
-        rings = find_planar_rings([self.atoms[name] for name in self.names], self.dist_result, planarityThreshold)
+        planarityThreshold = 9999999
+        # print(self.dist_result)
+        rings = find_planar_rings([self.atoms[name] for name in self.names], cell, self.dist_result, planarityThreshold)
+        # print(rings)
         for ring in rings:
             length = len(ring)
             IDs = []
@@ -636,11 +659,33 @@ class Bond(object):
         self.atom2 = atom2
         self.set_id()
         self.grow = True
-        self.length = norm(atom1.get_cart() - atom2.get_cart())
+        self.length = Bond.dist(atom1.frac, atom2.frac, atom1.cell)
         if self.length < covalence_radius[atom1.get_element()] + covalence_radius[atom2.get_element()] + .1:
             self.too_far = False
             self.set_xi()
             self.set_bond_order()
+            # if 'C(1)_2' in [self.atom1.get_name(), self.atom2.get_name()]:
+            #     print(sorted([self.atom1.get_name(), self.atom2.get_name()]))
+        else:
+            pass
+
+    @staticmethod
+    def dist(pos1, pos2, cell):
+        x, y, z = pos1
+        try:
+            xx, yy, zz = pos2 + 99.5
+        except TypeError:
+            xx, yy, zz = np.array(pos2) + 99.5
+        dx = (xx - x) % 1 - 0.5
+        dy = (yy - y) % 1 - 0.5
+        dz = (zz - z) % 1 - 0.5
+        a, b, c, alpha, beta, gamma = cell
+        alpha = alpha / 180 * np.pi
+        beta = beta / 180 * np.pi
+        gamma = gamma / 180 * np.pi
+        dd = a ** 2 * dx ** 2 + b ** 2 * dy ** 2 + c ** 2 * dz ** 2 + 2 * b * c * np.cos(
+            alpha) * dy * dz + 2 * a * c * np.cos(beta) * dx * dz + 2 * a * b * np.cos(gamma) * dx * dy
+        return dd ** .5
 
     def get_partner(self, atom):
         """
@@ -815,7 +860,7 @@ class Atom(object):
                 break
         return element.capitalize()
 
-    def __init__(self, name, element=None):
+    def __init__(self, name, cell,  element=None):
         """
         Initializes the Atom instance.
         :param name: must be an unique
@@ -825,6 +870,8 @@ class Atom(object):
         the atom name.
         """
         self.cart = None
+        self.frac = None
+        self.cell = cell
         self.enviroment = None
         self.get_id = self.get_name
         self.name = name

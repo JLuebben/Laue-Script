@@ -222,7 +222,7 @@ def get_orientation_vector(atom1, atom2):
     return v / np.linalg.norm(v)
 
 
-def framework_crawler(atom, direction, rigid_group_old=None):
+def framework_crawler2(atom, direction, rigid_group_old=None):
     """
     Function to identify atoms belonging to a previosly defined rigid
     group.
@@ -233,6 +233,7 @@ def framework_crawler(atom, direction, rigid_group_old=None):
 
     Returns a list of atom names belonging to the rigid group.
     """
+    print(1)
     if not rigid_group_old:
         rigid_group = [atom, direction]
     else:
@@ -240,7 +241,7 @@ def framework_crawler(atom, direction, rigid_group_old=None):
     for atom in get_framework_neighbours(direction):
         if not atom in rigid_group and not atom.element == 'H':
             rigid_group.append(atom)
-            framework_crawler(rigid_group[0], atom, rigid_group)
+            framework_crawler2(rigid_group[0], atom, rigid_group)
     if not rigid_group_old:
         #=======================================================================
         # print '    Determined rigid group:', [i.name for i in rigid_group]

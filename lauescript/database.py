@@ -384,8 +384,8 @@ def generate_database(data, frequency_cutoff, clean=True, temperatures=None,
                 apd_exit(2, '\n\nERROR: Cannot find database file at\n  >>>{}<<<\n'
                             'Please check if "~/.APDToolkit.ini" points to the correct location.'.format(path + '/database.pkl'))
         else:
-            picklepointer = open('database.pkl', 'r')
-        data = cPickle.load(picklepointer)
+            picklepointer = open('database.pkl', 'rb')
+        data = cPickle.load(picklepointer, encoding='latin1')
         data.save = False
         data.set_temperature(temperatures)
         data.update(errorlog, printer, path=path)

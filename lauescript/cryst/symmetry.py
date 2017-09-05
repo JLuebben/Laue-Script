@@ -5,7 +5,7 @@ Created on Jun 19, 2014
 """
 from copy import deepcopy, copy
 from numpy import array, matrix, dot
-from lauescript.cryst.transformations import ADP_to_matrix, ADP_to_XD_list, frac2cart, frac2cart_ADP
+from lauescript.cryst.transformations import ADP_to_matrix, ADP_to_XD_list, frac2cart, frac2cart_ADP, cart2frac, cart2frac_ADP
 from lauescript.types.adp import ADPDataError
 
 
@@ -107,5 +107,24 @@ class SymmetryElement(object):
         except ADPDataError:
             pass
         return new_atom
+
+    def apply2cart(self, position, cell):
+        positionFrac = cart2frac(position, cell)
+
+        newfrac = dot(positionFrac, self.matrix) + self.trans
+        newfrac = array(*newfrac[0,].tolist())
+        newcart = frac2cart(newfrac, cell)
+        return newcart
+
+
+    def apply2cart_ADP(self, adp, cell):
+        adpFrac = cart2frac_ADP(adp, cell)
+
+        old_adp = ADP_to_matrix(adpFrac)
+        new_adp = dot(self.matrix.transpose(), old_adp)
+        new_adp = dot(new_adp, self.matrix)
+        new_adp = ADP_to_XD_list(new_adp)
+        new_adp_frac = frac2cart_ADP(new_adp, cell)
+        return new_adp_frac
 
 

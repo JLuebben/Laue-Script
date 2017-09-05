@@ -308,6 +308,8 @@ class MOLECULE(MoleculeInterface):
             if atom.molecule_id == None:
                 atom.set_molecule_id(self.ID)
                 self.ID += 1
+        # for m in self.chem_mol:
+        #     print([a.name for a in m])
         return self.ID
 
     def get_distances(self, force_update=False):
@@ -317,14 +319,29 @@ class MOLECULE(MoleculeInterface):
         """
         if self.dist_done and not force_update:
             return
-        samples = self.coords()
-        neigh = NearestNeighbors(5, 0.4)
-        neigh.fit(samples)
-        result = neigh.kneighbors(samples, len(samples), return_distance=False)
-        self.distance_matrix = result
-        for atom_dist in result:
-            self.atoms[atom_dist[0]].partner = [self.atoms[i] for i in atom_dist[1:]]
+        # samples = self.coords()
+        # neigh = NearestNeighbors(5, 0.4)
+        # neigh.fit(samples)
+        # result = neigh.kneighbors(samples, len(samples), return_distance=False)
+        # self.distance_matrix = result
+        # for atom_dist in result:
+        #     self.atoms[atom_dist[0]].partner = [self.atoms[i] for i in atom_dist[1:]]
         self.dist_done = True
+
+        # samples2 = [atom.get_frac() for atom in self.atoms]
+
+        dist_results = []
+        for atom1 in self.atoms:
+            dists = []
+            for i, atom2 in enumerate(self.atoms):
+                d = atom1-atom2
+                dists.append((d, i))
+            dists = sorted(dists, key=lambda pair: pair[0])
+            dists = [self.atoms[d[1]] for d in dists[1:]]
+            atom1.partner = dists
+            # if atom1.name == 'C(2)':
+            #     print(atom1, [a for a in atom1.partner[:10]])
+            #     print(atom1, [a.name for a in atom1.partner])
 
     def iter_atoms(self, sort=False):
         """

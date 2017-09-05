@@ -14,6 +14,7 @@ NAME = 'Auto'
 import numpy as np
 
 import lauescript.cryst.crystgeom as cg
+from lauescript.cryst.geom import get_framework_neighbors
 
 MIMIMUM_SIZE = 4
 MIMIMUM_SIZE = 5
@@ -180,7 +181,7 @@ def get_potential_axis(matrix):
     axislist = []
     for atom in data['exp'].atoms:
         atomtypes = parse_inv_name(atom.invariom_name)
-        frame_atoms = cg.get_framework_neighbours(atom)
+        frame_atoms = get_framework_neighbours(atom)
         if len(atomtypes) > 1:
             for atom2 in frame_atoms:
                 if atom2.name[0] in atomtypes and cg.get_atom_with_longest_bond(atom2.name[0], atom):

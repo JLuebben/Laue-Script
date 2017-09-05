@@ -191,7 +191,10 @@ class ATOM(AtomInterface):
             self.invarioms[name] = orientation
 
     def __sub__(self, atom):
-        x, y, z = self.frac
+        try:
+            x, y, z = self.get_frac()
+        except TypeError:
+            return abs(norm(self.cart - atom.get_cart()))
         try:
             xx, yy, zz = atom.get_frac() + 99.5
         except TypeError:
@@ -401,9 +404,10 @@ class ATOM(AtomInterface):
                 try:
                     neighbors.append((atom2, self-atom2))
                 except KeyError:
-                    neighbors.append((atom2, norm(self.cart - atom2.cart)))
+                    neighbors.append((atom2, self - atom2))
         neighbors = sorted(neighbors, key=lambda value: value[1])
         self.partner = [neighbor[0] for neighbor in neighbors]
+
 
     def averageADP(self):
         cartAdp = array([0]*6)

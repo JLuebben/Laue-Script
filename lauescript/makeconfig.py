@@ -3,7 +3,10 @@ Module for generating an init script.
 """
 __author__ = 'jens'
 
-from ConfigParser import ConfigParser
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 from os.path import expanduser, join
 from sys import argv
 import inspect
@@ -43,8 +46,8 @@ def run(outputName=None, data_path=None, plugin_path=None):
         data_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))[:-3] + 'data'
     if not plugin_path:
         plugin_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))[:-3] + 'examplePlugins'
-    report = False
-    files = False
+    report = 'false'
+    files = 'false'
     if '-i' in argv:
         data_path, report, files = interactive()
     conf = ConfigParser()
@@ -53,12 +56,12 @@ def run(outputName=None, data_path=None, plugin_path=None):
     conf.add_section('Errors')
     conf.set('APD', 'DatabasePath', data_path)
     conf.set('APD', 'PluginPath', plugin_path)
-    conf.set('APD', 'newH', True)
+    conf.set('APD', 'newH', 'true')
     conf.set('Errors', 'ReportErrors', report)
     conf.set('Errors', 'IncludeInput', files)
     conf.set('Errors', 'ServerAddress', '134.76.64.183')
-    conf.set('Errors', 'Port', 7235)
-    conf.set('Database', 'Frequency_cutoff', 200)
+    conf.set('Errors', 'Port', '7235')
+    conf.set('Database', 'Frequency_cutoff', '200')
     conf.set('Database', 'ModelcompountRootdirectory', 'Not used')
     conf.set('Database', 'frequency_scale', '1')
     with open(expanduser(outputName), 'w') as fp:

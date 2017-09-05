@@ -224,7 +224,13 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, pl
     """
     printer = config.get_active_printer()
     loader.auto_setup(filename)
-    data.register_molecule(loader.load('exp'), 'exp')
+
+    iop = loader.get_IOP()
+    # if iop.supportsSym:
+    #     iop.grow()
+    #     for a in data['exp'].atoms:
+    #         print(a.get_name())
+    data.register_molecule(loader.load('exp', grow=iop.supportsSym), 'exp')
 
     data['exp'].give_cell(loader.get_cell())
     T = config.arg('temp')
@@ -235,6 +241,7 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, pl
         T = 100
     T = int(T)
     data.give_temperature(T)
+
 
     dabapa = dabapath + '/APD_DABA_{:.1f}_.txt'.format(data.temperature)
     printer('Crystal temperature: {:.1f} K'.format(data.temperature))
@@ -258,6 +265,7 @@ def FlexLoad(data, loader, dabapath, config, filename='./', noTransfer=False, pl
     correctionsPointer = open(dabapath + '/empirical_corrections.txt')
     for invdict, orientations, compounds in invstring.get_invariom_names(names=[i.name for i in data['exp'].atoms],
                                                                          cart=[i.cart for i in data['exp'].atoms],
+                                                                         cell=iop.get_cell(),
                                                                          dictionary=True,
                                                                          orientations=True,
                                                                          compounds=open(dabapath + '/APD_MAP.txt'),

@@ -1,6 +1,9 @@
 __author__ = 'jens'
 
-from ConfigParser import ConfigParser, NoSectionError
+try:
+    from ConfigParser import ConfigParser, NoSectionError
+except ImportError:
+    from configparser import ConfigParser, NoSectionError
 from os.path import expanduser, isdir
 from sys import argv
 
@@ -31,9 +34,9 @@ class ProjectManager(object):
         conf.add_section('Projects')
         conf.add_section('Options')
         conf.set('Projects', 'ProjectPath', expanduser('~/Laue-Script/projects'))
-        conf.set('Options', '-p', True)
-        conf.set('Options', '-v', False)
-        conf.set('Options', 'build', False)
+        conf.set('Options', '-p', 'true')
+        conf.set('Options', '-v', 'false')
+        conf.set('Options', 'build', 'false')
         with open(expanduser('~/.laue_script.ini'), 'w') as fp:
             conf.write(fp)
 
@@ -45,12 +48,12 @@ class ProjectManager(object):
             try:
                 parser = parser(string, items)
             except ArgParseError:
-                print 'Exiting gracefully after argument parsing error.'
+                print( 'Exiting gracefully after argument parsing error.')
                 exit()
         try:
             parser.validate()
         except ArgParseError:
-            print 'Exiting gracefully...'
+            print( 'Exiting gracefully...')
             exit()
 
     def arg(self, string):
@@ -86,7 +89,7 @@ class DefaultParser(Parser):
                 self.manager.options[string] = True
                 return self
         except KeyError:
-            print '\'{}\' not recognised.'.format(string)
+            print( '\'{}\' not recognised.'.format(string))
             raise ArgParseError
 
 
@@ -100,7 +103,7 @@ class ArgumentParser(Parser):
         return DefaultParser(self.manager)
 
     def validate(self):
-        print 'Error: Missing argument for option {}'.format(self.option)
+        print( 'Error: Missing argument for option {}'.format(self.option))
         raise ArgParseError
 
 
@@ -111,6 +114,6 @@ class ArgParseError(Exception):
 
 if __name__ == '__main__':
     pm = ProjectManager()
-    print pm.arg('-p')
-    print pm.arg('-v')
-    print pm.arg('build')
+    print( pm.arg('-p'))
+    print( pm.arg('-v'))
+    print( pm.arg('build'))

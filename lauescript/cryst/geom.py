@@ -37,6 +37,13 @@ def is_bound(pos1, el1, pos2, el2):
         return True
     return False
 
+def is_bound2(d, el1, el2):
+    threshold = 0.1
+    if el1 == 'H' or el2 == 'H':
+        threshold = 0.2
+    return d < covalence_radius[el1] + covalence_radius[el2] + threshold
+
+
 
 # ===============================================================================
 # cart1=[1.1,1.2,0]
@@ -87,7 +94,7 @@ def get_framework_neighbors(atom, useH=True):
     """
     neighborlist = []
     for atom2 in atom.partner[:5]:
-        if np.linalg.norm(atom.cart - atom2.cart) <= float(covalence_radius[atom.element]) + float(
+        if atom-atom2 <= float(covalence_radius[atom.element]) + float(
                 covalence_radius[atom2.element]) + .1:
             if not 'H' == atom2.element or useH:
                 neighborlist.append(atom2)

@@ -11,20 +11,20 @@ def main():
     projectManager = ProjectManager(mode='create')
     projectPath = projectManager.getProjectsDirectory()
     if len(argv) < 2:
-        print 'Please specify the name of the project.'
+        print('Please specify the name of the project.')
         exit(1)
     newName = argv[1]
     if projectManager.projectExists(newName):
-        print 'Project files with this name already exist.'
+        print('Project files with this name already exist.')
         exit(2)
     projectPath += '/{}'.format(newName)
     makeFiles(projectPath, newName)
-    print '****** Created project: \'{}\' ******'.format(argv[1])
-    print 'Project files are located in \'{}\''.format(projectPath)
-    print 'To execute your program you will have to add \'{}\'\nto your PYTHONPATH environment variable.' \
+    print('****** Created project: \'{}\' ******'.format(argv[1]))
+    print( 'Project files are located in \'{}\''.format(projectPath))
+    print( 'To execute your program you will have to add \'{}\'\nto your PYTHONPATH environment variable.' \
           ' The executable is located in the \'bin\' subdirectory.\n' \
-          'To add code to your project edit the *.py file created in the \'source\' subdirectory.'.format(projectPath)
-    print 'Have fun!'
+          'To add code to your project edit the *.py file created in the \'source\' subdirectory.'.format(projectPath))
+    print( 'Have fun!')
 
 
 def makeFiles(rootPath, projectName):
@@ -66,16 +66,16 @@ if __name__ == '__main__':
     try:
         from {0}.{1}_main import main
     except ImportError:
-        print 'ImportError: Main module not found. Please check if PYTHONPATH ist set up correctly.'
+        print( 'ImportError: Main module not found. Please check if PYTHONPATH ist set up correctly.'
 
-        print 'Trying to guess project path. Even if this works, please try to fix PYTHONPATH.'
+        print( 'Trying to guess project path. Even if this works, please try to fix PYTHONPATH.'
         import sys
         import os
         sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         try:
             from {0}.{1}_main import main
         except ImportError:
-            print 'Nope. Not working. Nothing more I can do.'
+            print( 'Nope. Not working. Nothing more I can do.'
             exit(1)
         else:
             main()
@@ -104,10 +104,10 @@ def main():
     After configuration the plugin manager is executed.
     """
     if 'help' in argv:
-        print '\\n\\n########################################################################################\\n'\
+        print( '\\n\\n########################################################################################\\n'\
               '#                                         {0}                                           #\\n'\
               '########################################################################################\\n'
-        print 'A program for '
+        print( 'A program for '
         exit()
     argvs=argv[0:1]+['-{0}']+argv[1:]
     config_file = expanduser(join('~', '.{0}.ini'))
@@ -142,12 +142,12 @@ def run(pluginManager):
     The plugin manager will pass a reference to itself
     to the function.
     Use the APD_Printer instance returned by
-    pluginManager.setup() instead of the 'print'
+    pluginManager.setup() instead of the 'print('
     statement to generate auto-formatted cmd line output.
     :param pluginManager: Reference to the plugin manager
     instance.
     """
-    printer = pluginManager.setup()
+    print(er = pluginManager.setup()
 '''.format(projectName, '{\'load\': \'myFile.txt\'}')
 
 

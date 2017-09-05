@@ -93,7 +93,7 @@ class Loader(object):
         self.printer('Using file \'{}\' for coordinates and ADPs.'.format(selected_filename))
         self.register_IOP(self._determine_correct_IOP(selected_filename))
 
-    def load(self, name):
+    def load(self, name, grow=False):
         """
         Creates and returns a molecule object.
         """
@@ -103,6 +103,8 @@ class Loader(object):
         except IOError as a:
             # self.printer('Error: No valid file named {} found'.format(self.IOP.filename))
             apd_exit(1, '\nError: No valid file named {} found.\nTerminating APD-Toolkit.'.format(self.IOP.filename))
+        if grow:
+            self.IOP.grow()
         molecule = MOLECULE(name, cell=self.IOP.get_cell())
         for atom in self.IOP.provide(['cart', 'frac', 'adp_cart', 'element']):
             if not atom[4].startswith('W'):

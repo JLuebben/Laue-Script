@@ -3,7 +3,7 @@ Created on Apr 1, 2014
 
 @author: jens
 """
-from numpy import array
+from numpy import array, cos, pi
 
 from lauescript.cryst.transformations import frac2cart, \
     frac2cart_ADP, \
@@ -12,6 +12,7 @@ from lauescript.cryst.transformations import frac2cart, \
 from lauescript.laueio.io import IOP
 from lauescript.types.atom import AtomInterface
 from lauescript.core.core import apd_exit
+from lauescript.cryst.geom import is_bound2
 from collections import OrderedDict
 
 
@@ -94,6 +95,23 @@ class XDAtom(AtomInterface):
 
         return string
 
+    def __sub__(self, atom):
+        x, y, z = self.frac
+        try:
+            xx, yy, zz = atom.get_frac() + 99.5
+        except TypeError:
+            xx, yy, zz = array(atom.get_frac()) + 99.5
+        dx = (xx - x) % 1 - 0.5
+        dy = (yy - y) % 1 - 0.5
+        dz = (zz - z) % 1 - 0.5
+        a, b, c, alpha, beta, gamma = self.get_cell()
+        alpha = alpha/180*pi
+        beta = beta/180*pi
+        gamma = gamma/180*pi
+        dd = a ** 2 * dx ** 2 + b ** 2 * dy ** 2 + c ** 2 * dz ** 2 + 2 * b * c * cos(
+            alpha) * dy * dz + 2 * a * c * cos(beta) * dx * dz + 2 * a * b * cos(gamma) * dx * dy
+        return dd ** .5
+
 
 class XDIOP(IOP):
 
@@ -117,6 +135,8 @@ class XDIOP(IOP):
         self.T = None
         self.multipoles = None
         self.chemcons = None
+        self.supportsSym = True
+        self.centric = False
 
     def parse(self):
         self.cell = None
@@ -218,6 +238,15 @@ class XDIOP(IOP):
         except IOError:
             apd_exit(3, '\n\nERROR: Cannot find file {}'.format(self.master_file_name))
         for line in filepointer.readlines():
+            # print(line)
+            if line.startswith('SYMM'):
+                self.symmetry.append(
+                    ' '.join([i for i in line.rstrip().split(' ') if len(i) > 0][1:]).split(','))
+                continue
+            if line.startswith('LATT'):
+                line = [i for i in line[:-1].split() if i]
+                self.centric = True if line[1].upper() == 'C' else False
+                continue
             if line.lstrip(' ').startswith('!'):
                 continue
             if 'END SCAT' in line:
@@ -277,7 +306,10 @@ class XDIOP(IOP):
         filepointer.close()
 
     def set_U2(self, name, value):
-        self.key_dict[name].set_U2(value)
+        try:
+            self.key_dict[name].set_U2(value)
+        except KeyError:
+            pass
 
     def set_adp_cart(self, name, value):
         self.atoms[name].set_adp_cart(value)
@@ -296,6 +328,81 @@ class XDIOP(IOP):
 
     def get_id(self):
         return 'XD'
+
+    def get_symmetry(self):
+        return self.symmetry
+
+    def grow(self):
+        from lauescript.cryst.symmetry import SymmetryElement
+        symms = []
+        for symm in self.symmetry:
+            symmEl = SymmetryElement(symm)
+            symms.append(symmEl)
+        if self.centric:
+            symms.append(SymmetryElement(['-X', '-Y', '-Z']))
+            for symm in self.symmetry:
+                symm = SymmetryElement(symm, centric=True)
+                symms.append(symm)
+        newatoms = []
+        asymunits = {str(symm): [] for symm in symms}
+        for atom in self.atoms.values():
+            for symm in symms:
+                newCart = symm.apply2cart(atom.get_cart(), self.get_cell())
+                newName = atom.get_name() + '_{}'.format(symm.ID)
+                newADP = symm.apply2cart_ADP(atom.get_adp_cart(), self.get_cell())
+                newAtom = XDAtom()
+                newAtom.set_name(newName)
+                newAtom.set_frac(cart2frac(newCart, self.get_cell()))
+                newAtom.set_adp_frac(cart2frac_ADP(newADP, self.get_cell()))
+                newAtom.set_cell(self.get_cell())
+
+                newAtom.set_element(atom.get_element())
+
+                newAtom.set_custom_attribute('icor1',atom.get_custom_attribute('icor1'))
+                newAtom.set_custom_attribute('icor2', atom.get_custom_attribute('icor2'))
+                newAtom.set_custom_attribute('nax', atom.get_custom_attribute('nax'))
+                newAtom.set_custom_attribute('nay1', atom.get_custom_attribute('nay1'))
+                newAtom.set_custom_attribute('nay2',atom.get_custom_attribute('nay2'))
+
+                newAtom.set_custom_attribute('max_U',atom.get_custom_attribute('max_U'))
+                newAtom.set_custom_attribute('sfac', atom.get_custom_attribute('sfac'))
+                newAtom.set_custom_attribute('kappa_set', atom.get_custom_attribute('kappa_set'))
+                newAtom.set_custom_attribute('lmax', atom.get_custom_attribute('lmax'))
+                newAtom.set_custom_attribute('isym', atom.get_custom_attribute('isym'))
+                newAtom.set_custom_attribute('ichcon', atom.get_custom_attribute('ichcon'))
+
+                newAtom.set_custom_attribute('multipoles', atom.get_custom_attribute('multipoles'))
+
+                newAtom.set_occupancy(atom.get_occupancy())
+
+
+                newatoms.append(newAtom)
+
+        live = True
+        while live:
+            live = False
+            addedAtoms = []
+            for atom in newatoms:
+
+                for atom2 in list(self.atoms.values()) + addedAtoms:
+                    d = atom-atom2
+                    if is_bound2(d, atom.get_element(), atom2.get_element()):
+                        live = True
+                        # print(atom.get_name(), 'is bound to', atom2.get_name())
+                        addedAtoms.append(atom)
+                        self.atoms[atom.get_name()] = atom
+                        self.names.append(atom.get_name())
+                        self.cart[atom.get_name()] = atom.get_cart()
+                        self.frac[atom.get_name()] = atom.get_frac()
+                        self.element[atom.get_name()] = atom.get_element()
+                        self.adp_cart[atom.get_name()] = atom.get_adp_cart()
+                        self.adp_frac[atom.get_name()] = atom.get_adp_frac()
+                        break
+            for atom in addedAtoms:
+                newatoms.remove(atom)
+        # for k,v in self.atoms.items():
+        #     print(v)
+
 
     def __str__(self):
         self.write_master_file()

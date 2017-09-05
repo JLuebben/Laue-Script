@@ -1,65 +1,86 @@
 import numpy as np
 
-from lauescript.cryst.geom import is_bound
+from lauescript.cryst.geom import is_bound2
+import lauescript
 
 
-def findRings(atoms, elements, coordinates):
+def find_planar_rings(atoms, cell, bonds=None, planarityThreshold=.1 ):
+    a = [atom.get_name() for atom in atoms]
+    e = [atom.get_element() for atom in atoms]
+    c = [atom.get_cart() for atom in atoms]
+    return findRings(a, e, c, cell, planarityThreshold)
+
+def findRings(atoms, elements, coordinates, cell, planarityThreshold):
     ringData = {}
-    rawData = []
+    rawData = set()
     Node.reset()
     nodes = [Node(name) for name in atoms]
     for i, items in enumerate(zip(atoms, elements, coordinates)):
         atomName1, element1, pos1 = items
+        frac1 = lauescript.cryst.transformations.cart2frac(pos1, cell)
         for j, items2 in enumerate(zip(atoms, elements, coordinates)):
             atomName2, element2, pos2 = items2
-            dist = np.linalg.norm(pos2-pos1)
+            if atomName1 == atomName2:
+                continue
 
-            if is_bound(dist, element1, element2):
+            frac2 = lauescript.cryst.transformations.cart2frac(pos2, cell)
+            dist = lauescript.invstring2.Bond.dist(frac1, frac2, cell)
+
+            if is_bound2(dist, element1, element2):
                 nodes[i].connect(atomName2)
+    # print()
     for node in nodes:
+        # print(node.name)
         node.findRing(5)
         Node.finalize()
         rings = Node.getRings()
-        rings = are_planar(atoms, coordinates, rings)
-        for r in rings:
-            rawData.append([n.name for n in r])
+        rings = are_planar(atoms, coordinates, rings, planarityThreshold)
+        rawData.update(['#'.join(sorted([n.name for n in ring])) for ring in rings])
         r5 = len(rings)
         Node.reset()
 
         node.findRing(6)
         Node.finalize()
         rings = Node.getRings()
-        rings = are_planar(atoms, coordinates, rings)
-        for r in rings:
-            rawData.append([n.name for n in r])
+        # for ring in rings:
+        #     print('xxxxxxxxx',[x.name for x in ring])
+        # print(['#'.join(sorted([n.name for n in ring])) for ring in rings])
+        rings = are_planar(atoms, coordinates, rings, planarityThreshold)
+        # print('planar')
+        # for ring in rings:
+        #     print('yyyyyyyy',[x.name for x in ring])
+        rawData.update(['#'.join(sorted([n.name for n in ring])) for ring in rings])
+        # for r in rings:
+        #     rawData.append(r.split('#'))
         r6 = len(rings)
         Node.reset()
 
         node.findRing(7)
         Node.finalize()
         rings = Node.getRings()
-        rings = are_planar(atoms, coordinates, rings)
-        for r in rings:
-            rawData.append([n.name for n in r])
+        rings = are_planar(atoms, coordinates, rings, planarityThreshold)
+        rawData.update(['#'.join(sorted([n.name for n in ring])) for ring in rings])
         r7 = len(rings)
         Node.reset()
 
         node.findRing(8)
         Node.finalize()
         rings = Node.getRings()
-        rings = are_planar(atoms, coordinates, rings)
-        for r in rings:
-            rawData.append([n.name for n in r])
+        rings = are_planar(atoms, coordinates, rings, planarityThreshold)
+        rawData.update(['#'.join(sorted([n.name for n in ring])) for ring in rings])
         r8 = len(rings)
 
         ringData[node.name] = '{}{}{}{}'.format('8' * r8,
                                                 '7' * r7,
                                                 '6' * r6,
                                                 '5' * r5)
+    # for d in rawData:
+    #     print(d)
+    rawData = [datum.split('#') for datum in rawData]
     return rawData
 
 
-def are_planar(atoms, coordinates, all_rings, planarityThreshold=.1):
+def are_planar(atoms, coordinates, all_rings, planarityThreshold=.2):
     atom_dict = {atom: cart for atom, cart in zip(atoms, coordinates)}
     planar_rings = []
     for ring in all_rings:
@@ -95,6 +116,9 @@ class Node(object):
         Node.id += 1
         Node.map[name] = self
         self.connections = set()
+
+    def __lt__(self, other):
+        return self.name < other.name
 
     def connect(self, name):
         self.connections.add(Node.map[name])
